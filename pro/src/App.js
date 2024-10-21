@@ -1,8 +1,8 @@
-// src/App.js
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './PrivateRoute';
 import Login from './components/Login';
+import Register from './components/Register';
 import HomePage from './pages/HomePage';
 
 function App() {
@@ -12,6 +12,8 @@ function App() {
         <Routes>
           {/* ログインページ */}
           <Route path="/login" element={<Login />} />
+          {/* 登録ページ */}
+          <Route path="/register" element={<Register />} />
           {/* トップページ */}
           <Route
             path="/"

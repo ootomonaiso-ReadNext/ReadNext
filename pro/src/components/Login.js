@@ -1,32 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
-
-// Material-UI のコンポーネントをインポート
+// src/Login.js
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
-function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await login(username, password);
-      alert('Login successful');
-      navigate('/');
-    } catch (error) {
-      console.error('Login failed', error);
-      alert('Invalid username or password');
-    }
+  
+  const handleLogin = () => {
+    // 仮の認証処理
+    setIsAuthenticated(true);
+    navigate('/home'); // ログイン成功後、ホーム画面へ遷移
   };
 
   return (
     <Container maxWidth="sm">
       <Box 
         component="form" 
-        onSubmit={handleSubmit} 
+        onSubmit={(e) => { e.preventDefault(); handleLogin(); }} 
         sx={{ mt: 8, display: 'flex', flexDirection: 'column', gap: 2 }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
@@ -35,8 +25,6 @@ function Login() {
         <TextField
           label="Username"
           variant="outlined"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
           required
           fullWidth
         />
@@ -44,13 +32,22 @@ function Login() {
           label="Password"
           type="password"
           variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
           fullWidth
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Login
+          Log In
+        </Button>
+        
+        {/* 追加されたアカウント作成ボタン */}
+        <Button 
+          component={Link} 
+          to="/register" 
+          variant="outlined" 
+          color="secondary" 
+          fullWidth
+        >
+          Create Account
         </Button>
       </Box>
     </Container>
