@@ -1,3 +1,4 @@
+// src/context/AuthContext.js
 import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
@@ -6,9 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // ログイン状態をlocalStorageから取得
     const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token); // トークンがあれば認証済み
+    setIsAuthenticated(!!token); // トークンが存在する場合に認証済みとする
   }, []);
 
   const login = (token) => {
