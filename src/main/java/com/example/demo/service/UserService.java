@@ -6,9 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-
+import com.example.demo.model.jpa.User;
+import com.example.demo.repository.jpa.UserRepository;
 
 @Service
 public class UserService {
@@ -35,7 +34,7 @@ public class UserService {
 
     public User loginUser(String username, String password) {
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
         if (passwordEncoder.matches(password, user.getPassword())) {
             return user;
         } else {
@@ -43,4 +42,3 @@ public class UserService {
         }
     }
 }
-

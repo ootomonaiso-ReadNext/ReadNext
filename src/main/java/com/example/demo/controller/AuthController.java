@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +14,8 @@ import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -19,14 +24,18 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         userService.registerNewUser(registerRequest.getUsername(), registerRequest.getEmail(), registerRequest.getPassword());
         return ResponseEntity.ok("User registered successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
-        return ResponseEntity.ok("Login successful");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Login successful");
+        // ユーザーIDや他のデータも必要に応じて追加
+        return ResponseEntity.ok(response);
     }
 }
