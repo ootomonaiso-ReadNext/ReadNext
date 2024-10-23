@@ -1,41 +1,27 @@
 package com.example.demo.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.service.UserService;
-
-import jakarta.validation.Valid;
-
-@RestController
-@RequestMapping("/api/auth")
+@Controller
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        userService.registerNewUser(registerRequest.getUsername(), registerRequest.getEmail(), registerRequest.getPassword());
-        return ResponseEntity.ok("User registered successfully");
+    @GetMapping("/login")
+    public String login() {
+        return "login";  // login.htmlに対応
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+    @GetMapping("/dashboard")
+    public String dashboard(Model model, @AuthenticationPrincipal OAuth2User oauthUser) {
+        model.addAttribute("name", oauthUser.getAttribute("name"));
+        return "dashboard";  // dashboard.htmlに対応
+    }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Login successful");
-        // ユーザーIDや他のデータも必要に応じて追加
-        return ResponseEntity.ok(response);
+    @GetMapping("/")
+    public String home() {
+        return "index";  // index.htmlに対応
     }
 }
