@@ -1,28 +1,22 @@
-// src/context/AuthContext.js
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token); // トークンが存在する場合に認証済みとする
-  }, []);
+  const [authToken, setAuthToken] = useState(localStorage.getItem('token') || null);
 
   const login = (token) => {
+    setAuthToken(token);
     localStorage.setItem('token', token);
-    setIsAuthenticated(true);
   };
 
   const logout = () => {
+    setAuthToken(null);
     localStorage.removeItem('token');
-    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ authToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

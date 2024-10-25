@@ -1,18 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { GoogleOAuthProvider } from '@react-oauth/google'; // 新しいパッケージを使用
-import { AuthProvider } from './context/AuthContext'; // 認証コンテキストをインポート
-
-const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID; // 環境変数からクライアントIDを取得
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <GoogleOAuthProvider clientId={clientId}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </GoogleOAuthProvider>
-  </React.StrictMode>,
+  <GoogleOAuthProvider clientId="107285687559-nqjudb9mfrsaua8gdcjbjpt69d4f457r.apps.googleusercontent.com">
+    <App />
+  </GoogleOAuthProvider>,
   document.getElementById('root')
 );
