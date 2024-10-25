@@ -1,15 +1,18 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client'; // createRootをインポート
+import ReactDOM from 'react-dom';
 import App from './App';
-import './index.css';
+import { GoogleOAuthProvider } from '@react-oauth/google'; // 新しいパッケージを使用
+import { AuthProvider } from './context/AuthContext'; // 認証コンテキストをインポート
 
-// ルート要素を取得
-const rootElement = document.getElementById('root');
+const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID; // 環境変数からクライアントIDを取得
 
-// createRootを使用してアプリケーションをレンダリング
-const root = createRoot(rootElement);
-root.render(
+ReactDOM.render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <GoogleOAuthProvider clientId={clientId}>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </GoogleOAuthProvider>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
