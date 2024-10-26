@@ -20,8 +20,8 @@ function Login() {
 
       const data = await response.json();
       if (response.ok && data.token) {
-        login(data.token);
-        navigate('/');
+        login(data.token); // トークンをAuthContextに保存
+        navigate('/'); // ホームページへ遷移
       } else {
         console.error('ログインエラー:', data);
       }

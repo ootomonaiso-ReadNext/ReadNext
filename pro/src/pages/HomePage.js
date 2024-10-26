@@ -1,35 +1,40 @@
 import React, { useContext } from 'react';
-import { Container, Typography, Button, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { Button, Typography, Container, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function HomePage() {
-  const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
-
-  const handleLogout = () => {
-    logout(); // 認証トークンを削除
-    navigate('/login'); // ログイン画面へリダイレクト
-  };
+  const { isAuthenticated, handleLogout } = useAuth();
+  const { authToken } = useContext(AuthContext);
 
   return (
-    <Container maxWidth="md" sx={{ mt: 8, textAlign: 'center' }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Welcome to the Home Page!
-        </Typography>
-        <Typography variant="h5" component="p">
-          You have successfully logged in.
-        </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          onClick={handleLogout} 
-          sx={{ mt: 4 }}
-        >
-          Log Out
-        </Button>
-      </Box>
+    <Container maxWidth="md" sx={{ mt: 5 }}>
+      {isAuthenticated ? (
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="h4" gutterBottom>ようこそ！</Typography>
+          <Typography variant="body1" sx={{ mb: 3 }}>トークン: {authToken}</Typography>
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            onClick={handleLogout}
+          >
+            ログアウト
+          </Button>
+        </Box>
+      ) : (
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="h5" gutterBottom>ログインが必要です</Typography>
+          <Button 
+            component={Link} 
+            to="/login" 
+            variant="contained" 
+            color="primary"
+          >
+            ログインページへ
+          </Button>
+        </Box>
+      )}
     </Container>
   );
 }
