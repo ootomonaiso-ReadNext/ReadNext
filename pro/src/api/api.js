@@ -6,18 +6,32 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-export const googleLogin = (token) => {
-    return api.post('google', {}, { // リクエストボディは空のままでOK
+// Googleログインリクエストを送信する関数
+export const googleLogin = async (token) => {
+  try {
+    const response = await api.post('google', {}, {
       headers: {
-        'Authorization': `Bearer ${token}` // トークンはAuthorizationヘッダーで送信
+        'Authorization': `Bearer ${token}`, // トークンはAuthorizationヘッダーで送信
       }
     });
+    return response.data; // 成功時のレスポンスデータを返す
+  } catch (error) {
+    console.error('Googleログインに失敗しました', error);
+    throw error; // エラーを呼び出し元に再スロー
+  }
 };
 
-export const register = (username, email, password) => {
-  return api.post('register', {
-    username,
-    email,
-    password
-  });
+// ユーザー登録リクエストを送信する関数
+export const register = async (username, email, password) => {
+  try {
+    const response = await api.post('register', {
+      username,
+      email,
+      password,
+    });
+    return response.data; // 成功時のレスポンスデータを返す
+  } catch (error) {
+    console.error('ユーザー登録に失敗しました', error);
+    throw error; // エラーを呼び出し元に再スロー
+  }
 };
