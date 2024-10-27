@@ -10,6 +10,7 @@ import {
   Box,
   Divider,
 } from "@mui/material";
+import GoogleIcon from '@mui/icons-material/Google'; // Googleアイコンの追加
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,10 @@ const Login = () => {
     } catch (error) {
       console.error(error.message);
     }
+  };
+
+  const navigateToRegister = () => {
+    navigate("/register");
   };
 
   return (
@@ -84,9 +89,19 @@ const Login = () => {
           variant="outlined"
           color="secondary"
           fullWidth
+          startIcon={<GoogleIcon />} // Googleアイコンを追加
           onClick={handleGoogleLogin}
+          sx={{ mb: 2 }}
         >
           Login with Google
+        </Button>
+        <Button
+          variant="text"
+          color="primary"
+          fullWidth
+          onClick={navigateToRegister}
+        >
+          Create a new account
         </Button>
       </Box>
     </Container>

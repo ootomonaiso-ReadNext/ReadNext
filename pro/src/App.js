@@ -11,7 +11,6 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* 認証済みユーザーのみがトップページにアクセス */}
           <Route 
             path="/" 
             element={
