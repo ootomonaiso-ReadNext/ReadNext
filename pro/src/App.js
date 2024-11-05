@@ -1,9 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import HomePage from './pages/HomePage';
+import UserMake from './pages/UserMake';
+import UserSetting from './pages/UserSetting'; // UserSettingコンポーネントをインポート
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -11,16 +13,25 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route 
-            path="/" 
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/usermake" element={<UserMake />} />
+          <Route
+            path="/"
             element={
               <ProtectedRoute>
                 <HomePage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/user-settings"
+            element={
+              <ProtectedRoute>
+                <UserSetting />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>

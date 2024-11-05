@@ -89,7 +89,7 @@ const Login = () => {
           variant="outlined"
           color="secondary"
           fullWidth
-          startIcon={<GoogleIcon />} // Googleアイコンを追加
+          startIcon={<GoogleIcon />} 
           onClick={handleGoogleLogin}
           sx={{ mb: 2 }}
         >

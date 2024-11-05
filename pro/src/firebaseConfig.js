@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAAq40rM6nz6AbXW5DifTf8Axm1Ss5xQFw",
@@ -11,11 +12,10 @@ const firebaseConfig = {
   measurementId: "G-8VBYEWKXQ9"
 };
 
+// Firebaseアプリの初期化
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
-});
 
-export { auth, googleProvider };
+// Firebaseサービスの初期化とエクスポート
+export const auth = getAuth(app);
+export const db = getFirestore(app); // Firestoreのエクスポートを追加
+export const googleProvider = new GoogleAuthProvider();
