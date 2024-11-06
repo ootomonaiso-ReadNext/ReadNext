@@ -72,27 +72,57 @@ const AddBookFromDatabasePage = () => {
   };
 
   // 書籍をFirestoreのbooksコレクションとユーザーの蔵書に追加
-  const handleAddBook = async (book) => {
-    try {
-      // Step 1: 書籍を `books` コレクションに追加
+const handleAddBook = async (book) => {
+  try {
+    // Step 1: 既存の書籍があるか確認
+    const booksQuery = query(
+      collection(db, "books"),
+      where("title", "==", book.title),
+      where("authors", "==", book.authors),
+      where("publishedDate", "==", book.publishedDate)
+    );
+    const querySnapshot = await getDocs(booksQuery);
+
+    let bookId;
+    if (!querySnapshot.empty) {
+      // 重複する書籍が存在する場合
+      bookId = querySnapshot.docs[0].id; // 既存のドキュメントIDを取得
+      console.log("既存の書籍を使用します:", bookId);
+    } else {
+      // 重複する書籍が存在しない場合、新規追加
       const bookDoc = {
         title: book.title,
         authors: book.authors,
+        publisher: book.publisher || "不明",
         publishedDate: book.publishedDate,
-        description: book.description,
-        thumbnail: book.thumbnail,
+        description: book.description || "説明なし",
+        pageCount: book.pageCount || 0,
+        categories: book.categories || [],
+        averageRating: book.averageRating || null,
+        ratingsCount: book.ratingsCount || 0,
+        language: book.language || "不明",
+        previewLink: book.previewLink || null,
+        infoLink: book.infoLink || null,
+        thumbnail: book.thumbnail || null,
       };
       const bookRef = await addDoc(collection(db, "books"), bookDoc);
-
-      // Step 2: ユーザーの `userBooks` コレクションに書籍IDを追加
-      const userBookRef = doc(db, "userBooks", user.uid, "books", bookRef.id);
-      await setDoc(userBookRef, { addedAt: new Date() });
-
-      alert("新しい書籍が登録されました！");
-    } catch (error) {
-      console.error("Error adding book to user's collection: ", error);
+      bookId = bookRef.id; // 新しい書籍のIDを取得
+      console.log("新しい書籍を追加しました:", bookId);
     }
-  };
+
+    // Step 2: ユーザーの `userBooks` サブコレクションに書籍IDを追加
+    const userBooksRef = doc(db, "users", user.uid, "userBooks", bookId);
+    await setDoc(userBooksRef, {
+      addedAt: new Date(),
+      bookId: bookId, // 書籍IDを保存
+    });
+
+    alert("書籍がユーザーの蔵書に追加されました！");
+  } catch (error) {
+    console.error("Error adding book to user's collection: ", error);
+  }
+};
+
 
   // 現在のページの表示用データを取得
   const currentResults = searchResults.slice(
