@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import { Typography, Container, TextField, Button, List, ListItem } from "@mui/material";
+import { Typography, Container, TextField, Button, List, ListItem, Card, CardMedia, CardContent } from "@mui/material";
 
 const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes?q=";
 
@@ -34,6 +34,7 @@ const AddBookFromDatabasePage = () => {
       authors: item.volumeInfo.authors || ["不明"],
       publishedDate: item.volumeInfo.publishedDate || "不明",
       description: item.volumeInfo.description || "説明なし",
+      thumbnail: item.volumeInfo.imageLinks?.thumbnail || null, // 画像URLを取得
     }));
     setSearchResults(books);
   };
@@ -53,6 +54,7 @@ const AddBookFromDatabasePage = () => {
       authors: book.authors,
       publishedDate: book.publishedDate,
       description: book.description,
+      thumbnail: book.thumbnail, // Firestoreにも画像URLを保存
     };
 
     await addDoc(collection(db, "books"), bookDoc);
@@ -82,14 +84,25 @@ const AddBookFromDatabasePage = () => {
 
       <List>
         {searchResults.map((book) => (
-          <ListItem key={book.id} style={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
-            <Typography variant="body1">{book.title}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {book.authors.join(", ")}
-            </Typography>
-            <Button onClick={() => handleAddBook(book)} color="primary" style={{ marginTop: "10px" }}>
-              追加
-            </Button>
+          <ListItem key={book.id} style={{ display: "flex", alignItems: "center" }}>
+            {/* 書籍画像 */}
+            {book.thumbnail && (
+              <CardMedia
+                component="img"
+                image={book.thumbnail}
+                alt={book.title}
+                style={{ width: 60, height: 90, marginRight: "10px" }}
+              />
+            )}
+            <CardContent>
+              <Typography variant="body1">{book.title}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {book.authors.join(", ")}
+              </Typography>
+              <Button onClick={() => handleAddBook(book)} color="primary" style={{ marginTop: "10px" }}>
+                追加
+              </Button>
+            </CardContent>
           </ListItem>
         ))}
       </List>

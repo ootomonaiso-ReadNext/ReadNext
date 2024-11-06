@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import UserMake from './pages/UserMake';
 import UserSetting from './pages/UserSetting';
 import UserBookshelfPage from './pages/UserBookshelfPage';
+import AddBookFromDatabasePage from './pages/AddBookFromDatabasePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
