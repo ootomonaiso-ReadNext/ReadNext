@@ -12,10 +12,8 @@ const firebaseConfig = {
   measurementId: "G-8VBYEWKXQ9"
 };
 
-// Firebaseアプリの初期化
 const app = initializeApp(firebaseConfig);
 
-// Firebaseサービスの初期化とエクスポート
 export const auth = getAuth(app);
-export const db = getFirestore(app); // Firestoreのエクスポートを追加
+export const db = getFirestore(app); 
 export const googleProvider = new GoogleAuthProvider();
