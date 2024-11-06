@@ -22,9 +22,9 @@ const AddBookFromDatabasePage = () => {
       where("title", "==", searchTerm)
     );
     const querySnapshot = await getDocs(booksQuery);
-
     const books = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setSearchResults(books);
+    console.log("Firestoreから書籍を取得:", querySnapshot.docs);
     return books;
   };
 
@@ -87,7 +87,7 @@ const AddBookFromDatabasePage = () => {
       let bookId;
       if (!querySnapshot.empty) {
         // 重複する書籍が存在する場合
-        bookId = querySnapshot.docs[0].id; // 既存のドキュメントIDを取得
+        bookId = querySnapshot.docs[0].id;
         console.log("既存の書籍を使用します:", bookId);
       } else {
         // 重複する書籍が存在しない場合、新規追加

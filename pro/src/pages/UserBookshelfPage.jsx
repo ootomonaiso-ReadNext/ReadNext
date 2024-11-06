@@ -93,25 +93,36 @@ const UserBookshelfPage = () => {
           </Typography>
         </div>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} direction="column"> {/* カード全体を縦に並べる */}
           {books.map((book) => (
-            <Grid item xs={12} sm={6} md={4} key={book.id}>
-              <Card>
+            <Grid item xs={12} key={book.id}>
+              <Card style={{ display: "flex", height: "150px" }}>
+                {/* サムネイル画像を左側に配置 */}
                 {book.thumbnail && (
                   <CardMedia
                     component="img"
                     image={book.thumbnail}
                     alt={book.title}
                     style={{
-                      maxHeight: 200,
-                      maxWidth: "100%",
+                      width: 100, // 固定幅を設定
                       objectFit: "contain",
-                      margin: "auto",
                     }}
                   />
                 )}
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>{book.title}</Typography>
+
+                {/* 書籍情報とステータス選択を右側に配置 */}
+                <CardContent style={{ flex: "1", padding: "10px" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {book.title}
+                  </Typography>
                   <Typography variant="body2" color="textSecondary">
                     {book.authors ? book.authors.join(", ") : "著者情報なし"}
                   </Typography>
