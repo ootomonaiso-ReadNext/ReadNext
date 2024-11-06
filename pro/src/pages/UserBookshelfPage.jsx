@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { Typography, Container, Button, Grid, Card, CardContent } from "@mui/material";
+import { Typography, Container, Button, Grid, Card, CardContent, CardMedia, Select, MenuItem } from "@mui/material";
 
 const UserBookshelfPage = () => {
   const { user } = useAuth();
@@ -19,20 +19,51 @@ const UserBookshelfPage = () => {
   // Firestoreからユーザーの蔵書を取得
   const fetchUserBooks = async () => {
     try {
-      const userBooksQuery = query(
-        collection(db, "userBooks"),
-        where("userId", "==", user.uid)
-      );
-      const querySnapshot = await getDocs(userBooksQuery);
-      const booksData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      setLoading(true);
+
+      const userBooksQuery = collection(db, "users", user.uid, "userBooks");
+      const userBooksSnapshot = await getDocs(userBooksQuery);
+
+      const bookPromises = userBooksSnapshot.docs.map(async (userBookDoc) => {
+        const bookId = userBookDoc.id;
+        const bookDocRef = doc(db, "books", bookId);
+        const bookSnapshot = await getDoc(bookDocRef);
+
+        if (bookSnapshot.exists()) {
+          return {
+            id: bookId,
+            ...bookSnapshot.data(),
+            status: userBookDoc.data().status || "未読", // ステータスをデフォルト「未読」で設定
+          };
+        } else {
+          console.warn(`書籍データが見つかりませんでした (ID: ${bookId})`);
+          return null;
+        }
+      });
+
+      const booksData = (await Promise.all(bookPromises)).filter(Boolean);
       setBooks(booksData);
     } catch (error) {
       console.error("Error fetching user books:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Firestoreで書籍のステータスを更新
+  const handleStatusChange = async (bookId, newStatus) => {
+    try {
+      const userBookRef = doc(db, "users", user.uid, "userBooks", bookId);
+      await updateDoc(userBookRef, { status: newStatus });
+
+      // ローカル状態を更新してUIに即時反映
+      setBooks((prevBooks) =>
+        prevBooks.map((book) =>
+          book.id === bookId ? { ...book, status: newStatus } : book
+        )
+      );
+    } catch (error) {
+      console.error("Error updating book status:", error);
     }
   };
 
@@ -42,41 +73,75 @@ const UserBookshelfPage = () => {
         あなたの蔵書
       </Typography>
 
+      {/* 蔵書を追加するボタンを常に表示 */}
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/add-from-database"
+        style={{ marginBottom: "20px" }}
+      >
+        蔵書を追加する
+      </Button>
+
       {loading ? (
         <Typography variant="body1">読み込み中...</Typography>
       ) : books.length === 0 ? (
-        // 蔵書がない場合のメッセージ
         <div style={{ textAlign: "center", margin: "20px 0" }}>
           <Typography variant="body1" color="textSecondary">
             現在、蔵書がありません。
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to="/add-from-database"
-            style={{ marginTop: "10px" }}
-          >
-            蔵書を追加する
-          </Button>
         </div>
       ) : (
-        // 蔵書がある場合の一覧表示
-        <Grid container spacing={2}>
+        <Grid container spacing={2} direction="column"> {/* カード全体を縦に並べる */}
           {books.map((book) => (
-            <Grid item xs={12} sm={6} md={4} key={book.id}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6">{book.title}</Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
+            <Grid item xs={12} key={book.id}>
+              <Card style={{ display: "flex", height: "150px" }}>
+                {/* サムネイル画像を左側に配置 */}
+                {book.thumbnail && (
+                  <CardMedia
+                    component="img"
+                    image={book.thumbnail}
+                    alt={book.title}
+                    style={{
+                      width: 100, // 固定幅を設定
+                      objectFit: "contain",
+                    }}
+                  />
+                )}
+
+                {/* 書籍情報とステータス選択を右側に配置 */}
+                <CardContent style={{ flex: "1", padding: "10px" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {book.title}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
                     {book.authors ? book.authors.join(", ") : "著者情報なし"}
                   </Typography>
-                  <Typography variant="body2">
-                    {book.publishedDate ? `発行日: ${book.publishedDate}` : ""}
+                  <Typography variant="body2" color="textSecondary">
+                    {book.publishedDate ? `発行年: ${book.publishedDate}` : ""}
                   </Typography>
-                  <Typography variant="body2" style={{ marginTop: "10px" }}>
-                    感想: {book.thoughts || "未記録"}
-                  </Typography>
+
+                  {/* ステータス選択メニュー */}
+                  <Select
+                    value={book.status}
+                    onChange={(e) => handleStatusChange(book.id, e.target.value)}
+                    fullWidth
+                    variant="outlined"
+                    style={{ marginTop: "10px" }}
+                  >
+                    <MenuItem value="未読">未読</MenuItem>
+                    <MenuItem value="読書中">読書中</MenuItem>
+                    <MenuItem value="読了済み">読了済み</MenuItem>
+                  </Select>
                 </CardContent>
               </Card>
             </Grid>
