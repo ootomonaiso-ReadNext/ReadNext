@@ -180,7 +180,7 @@ const UserBookshelfPage = () => {
                     </Box>
 
                     {/* ステータス選択メニューの調整 */}
-                    <FormControl fullWidth sx={{ mt: 1, mb: 1 }} size="small"> {/* 上下にマージンを追加 */}
+                    <FormControl fullWidth sx={{ mt: 1, mb: 1 }} size="small">
                       <InputLabel id={`status-select-label-${book.id}`}>ステータス</InputLabel>
                       <Select
                         labelId={`status-select-label-${book.id}`}
