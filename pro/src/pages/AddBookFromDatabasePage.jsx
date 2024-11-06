@@ -167,6 +167,14 @@ const handleAddBook = async (book) => {
         検索
       </Button>
 
+      <Pagination
+        count={Math.ceil(searchResults.length / RESULTS_PER_PAGE)}
+        page={currentPage}
+        onChange={handlePageChange}
+        color="primary"
+        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      />
+      
       <List>
         {currentResults.map((book, index) => (
           <ListItem key={`${book.id}-${index}`} style={{ display: "flex", alignItems: "center" }}>
