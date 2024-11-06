@@ -140,7 +140,7 @@ const AddBookFromDatabasePage = () => {
       const userBooksRef = doc(db, "users", user.uid, "userBooks", bookId);
       await setDoc(userBooksRef, {
         addedAt: new Date(),
-        bookId: bookId, // 書籍IDを保存
+        bookId: bookId, 
       });
 
       alert("書籍がユーザーの蔵書に追加されました！");

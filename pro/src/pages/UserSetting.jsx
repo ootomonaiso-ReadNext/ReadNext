@@ -18,7 +18,7 @@ const UserSetting = () => {
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
-          setUsername(userDocSnap.data().userName || ""); // Firestoreから取得したuserNameをセット
+          setUsername(userDocSnap.data().userName || "");
         }
       }
     };

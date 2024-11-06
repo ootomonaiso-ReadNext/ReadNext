@@ -45,7 +45,7 @@ const UserMake = () => {
         <Typography variant="h5" gutterBottom>
           サービスアカウント作成
         </Typography>
-        {error && <Typography color="error">{error}</Typography>} {/* エラーメッセージの表示 */}
+        {error && <Typography color="error">{error}</Typography>}
         <TextField
           label="User ID (Unique)"
           variant="outlined"

@@ -132,7 +132,7 @@ const UserBookshelfPage = () => {
           <Grid container spacing={3}>
             {books.map((book) => (
               <Grid item xs={12} key={book.id}>
-                <Card sx={{ display: "flex", height: "150px" }}> {/* 横並びレイアウト */}
+                <Card sx={{ display: "flex", height: "150px" }}>
                   <CardMedia
                     sx={{
                       width: 100,
@@ -188,7 +188,7 @@ const UserBookshelfPage = () => {
                       </Typography>
                     </Box>
 
-                    {/* ステータス選択メニューの調整 */}
+                    {/* ステータス選択メニューsizeかえただけのごり押し解決だからどうにかする */}
                     <FormControl fullWidth sx={{ mt: 1, mb: 1 }} size="small">
                       <InputLabel id={`status-select-label-${book.id}`}>ステータス</InputLabel>
                       <Select
