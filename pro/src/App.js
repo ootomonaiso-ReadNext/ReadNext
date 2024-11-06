@@ -41,6 +41,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/add-from-database"
+            element={
+              <ProtectedRoute>
+                <AddBookFromDatabasePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>
