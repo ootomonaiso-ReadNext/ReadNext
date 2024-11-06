@@ -93,9 +93,17 @@ const handleAddBook = async (book) => {
       const bookDoc = {
         title: book.title,
         authors: book.authors,
+        publisher: book.publisher || "不明",
         publishedDate: book.publishedDate,
-        description: book.description,
-        thumbnail: book.thumbnail,
+        description: book.description || "説明なし",
+        pageCount: book.pageCount || 0,
+        categories: book.categories || [],
+        averageRating: book.averageRating || null,
+        ratingsCount: book.ratingsCount || 0,
+        language: book.language || "不明",
+        previewLink: book.previewLink || null,
+        infoLink: book.infoLink || null,
+        thumbnail: book.thumbnail || null,
       };
       const bookRef = await addDoc(collection(db, "books"), bookDoc);
       bookId = bookRef.id; // 新しい書籍のIDを取得
@@ -114,6 +122,7 @@ const handleAddBook = async (book) => {
     console.error("Error adding book to user's collection: ", error);
   }
 };
+
 
 
   // 現在のページの表示用データを取得

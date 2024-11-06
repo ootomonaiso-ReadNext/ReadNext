@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { Typography, Container, Button, Grid, Card, CardContent } from "@mui/material";
 
@@ -19,15 +19,27 @@ const UserBookshelfPage = () => {
   // Firestoreからユーザーの蔵書を取得
   const fetchUserBooks = async () => {
     try {
-      const userBooksQuery = query(
-        collection(db, "userBooks"),
-        where("userId", "==", user.uid)
-      );
-      const querySnapshot = await getDocs(userBooksQuery);
-      const booksData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      setLoading(true);
+
+      // Step 1: ユーザーの userBooks サブコレクションから書籍IDを取得
+      const userBooksQuery = collection(db, "users", user.uid, "userBooks");
+      const userBooksSnapshot = await getDocs(userBooksQuery);
+
+      const bookPromises = userBooksSnapshot.docs.map(async (userBookDoc) => {
+        const bookId = userBookDoc.id; // userBooksのドキュメントIDが書籍のIDと同じ
+        const bookDocRef = doc(db, "books", bookId); // books コレクションから書籍ドキュメントを参照
+        const bookSnapshot = await getDoc(bookDocRef);
+
+        if (bookSnapshot.exists()) {
+          return { id: bookId, ...bookSnapshot.data() };
+        } else {
+          console.warn(`書籍データが見つかりませんでした (ID: ${bookId})`);
+          return null;
+        }
+      });
+
+      // 全ての書籍データを取得し、存在しないものはフィルタリング
+      const booksData = (await Promise.all(bookPromises)).filter(Boolean);
       setBooks(booksData);
     } catch (error) {
       console.error("Error fetching user books:", error);
@@ -75,7 +87,7 @@ const UserBookshelfPage = () => {
                     {book.publishedDate ? `発行日: ${book.publishedDate}` : ""}
                   </Typography>
                   <Typography variant="body2" style={{ marginTop: "10px" }}>
-                    感想: {book.thoughts || "未記録"}
+                    {book.description || "説明なし"}
                   </Typography>
                 </CardContent>
               </Card>
