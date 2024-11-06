@@ -1,24 +1,23 @@
-import React, { useState } from "react";
-import { signUpWithEmail } from "../services/authService";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const { setUser } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const { setUser, signUpWithEmailAndPassword } = useAuth();
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
     setError(null); // エラーを初期化
     try {
-      const userCredential = await signUpWithEmail(email, password);
+      const userCredential = await signUpWithEmailAndPassword(email, password);
       setUser(userCredential.user);
       navigate("/");
     } catch (error) {
-      setError(error.message); // エラーメッセージをセット
+      setError(error as string); // エラーメッセージをセット
     }
   };
 

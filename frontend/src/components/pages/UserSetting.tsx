@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { updateProfile } from "firebase/auth";
-import { db } from "../firebaseConfig"; // Firestoreの初期化ファイルをインポート
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore操作のための関数をインポート
 import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
+import { firestore } from "../../constants/firestore";
 
 const UserSetting = () => {
   const { user, setUser } = useAuth();
-  const [username, setUsername] = useState("");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
 
   // Firestoreからユーザー名を取得
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(firestore, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -25,7 +25,7 @@ const UserSetting = () => {
     fetchUserData();
   }, [user]);
 
-  const handleUsernameChange = (e) => {
+  const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
@@ -41,7 +41,7 @@ const UserSetting = () => {
       setUser({ ...user, displayName: username });
 
       // FirestoreのuserNameフィールドを更新
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(firestore, "users", user.uid);
       await updateDoc(userDocRef, { userName: username });
 
       setMessage("ユーザーネームの更新成功!");

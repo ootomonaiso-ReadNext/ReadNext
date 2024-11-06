@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { db } from "../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { Typography, Container, Button, Grid, Card, CardContent } from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
+import { bookConverter, firestore } from "../../constants/firestore";
+import type { Book } from "../../types/book";
 
 const UserBookshelfPage = () => {
   const { user } = useAuth();
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,8 +21,8 @@ const UserBookshelfPage = () => {
   const fetchUserBooks = async () => {
     try {
       const userBooksQuery = query(
-        collection(db, "userBooks"),
-        where("userId", "==", user.uid)
+        collection(firestore, "userBooks").withConverter(bookConverter),
+        where("userId", "==", user?.uid)
       );
       const querySnapshot = await getDocs(userBooksQuery);
       const booksData = querySnapshot.docs.map((doc) => ({
@@ -64,7 +65,7 @@ const UserBookshelfPage = () => {
         // 蔵書がある場合の一覧表示
         <Grid container spacing={2}>
           {books.map((book) => (
-            <Grid item xs={12} sm={6} md={4} key={book.id}>
+            <Grid item xs={12} sm={6} md={4} key={JSON.stringify(book)}>
               <Card>
                 <CardContent>
                   <Typography variant="h6">{book.title}</Typography>
@@ -75,7 +76,7 @@ const UserBookshelfPage = () => {
                     {book.publishedDate ? `発行日: ${book.publishedDate}` : ""}
                   </Typography>
                   <Typography variant="body2" style={{ marginTop: "10px" }}>
-                    感想: {book.thoughts || "未記録"}
+                    {/* 感想: {book.thoughts || "未記録"} */} 感想: 未記録
                   </Typography>
                 </CardContent>
               </Card>

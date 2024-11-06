@@ -1,7 +1,6 @@
 // 変えちゃだめだよ
 import { type FirebaseOptions, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: "AIzaSyAAq40rM6nz6AbXW5DifTf8Axm1Ss5xQFw",
@@ -13,7 +12,6 @@ const firebaseConfig: FirebaseOptions = {
   measurementId: "G-8VBYEWKXQ9",
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const db = getFirestore(app); 

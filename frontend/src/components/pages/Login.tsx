@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { loginWithEmail, loginWithGoogle } from "../services/authService";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -11,20 +9,21 @@ import {
   Divider,
 } from "@mui/material";
 import GoogleIcon from '@mui/icons-material/Google'; // Googleアイコンの追加
+import { useAuth } from "../../hooks/useAuth";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { setUser } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const { setUser, loginWithEmailAndPassword, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleEmailLogin = async () => {
     try {
-      const userCredential = await loginWithEmail(email, password);
+      const userCredential = await loginWithEmailAndPassword(email, password);
       setUser(userCredential.user);
       navigate("/");
     } catch (error) {
-      console.error(error.message);
+      console.error(error);
     }
   };
 
@@ -34,7 +33,7 @@ const Login = () => {
       setUser(userCredential.user);
       navigate("/");
     } catch (error) {
-      console.error(error.message);
+      console.error(error);
     }
   };
 

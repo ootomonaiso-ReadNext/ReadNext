@@ -1,14 +1,15 @@
 // src/pages/UserMake.js
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { createUserDocument } from "../services/userService";
+import { useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { doc, setDoc } from "firebase/firestore";
+import { firestore } from "../../constants/firestore";
 
 const UserMake = () => {
-  const [userId, setUserId] = useState("");
-  const [userName, setUserName] = useState("");
-  const [error, setError] = useState(null); 
+  const [userId, setUserId] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null); 
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -20,9 +21,15 @@ const UserMake = () => {
     }
 
     try {
+      if (!user?.uid) throw new Error("uidが存在しません")
       const settings = { theme: "light", notifications: true };
-      await createUserDocument(user.uid, userId, userName, settings);
-      alert("サービスアカウントが作成されました！");
+      await setDoc(doc(firestore, "users", user.uid || ""), {
+        userId,
+        userName,
+        settings,
+        createdAt: new Date()
+      })
+      alert("サービスアカウントが作成されました！")
       navigate("/");
     } catch (error) {
       console.error("Service Account Creation Error:", error.message);
