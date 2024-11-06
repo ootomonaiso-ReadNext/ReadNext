@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
 import { Typography, Container, TextField, Button, List, ListItem, CardMedia, CardContent, Pagination, Select, MenuItem } from "@mui/material";
 
 const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes?q=";
@@ -12,7 +12,7 @@ const AddBookFromDatabasePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState("relevance"); // デフォルトのソート順
+  const [sortOrder, setSortOrder] = useState("relevance");
 
   // Firestoreのbooksコレクションで書籍を検索
   const searchBooksInDatabase = async () => {
@@ -71,25 +71,58 @@ const AddBookFromDatabasePage = () => {
     setSortOrder(event.target.value);
   };
 
-  // 書籍をFirestoreのbooksコレクションに追加
-  const handleAddBook = async (book) => {
-    const bookDoc = {
-      title: book.title,
-      authors: book.authors,
-      publishedDate: book.publishedDate,
-      description: book.description,
-      thumbnail: book.thumbnail, 
-    };
+  // 書籍をFirestoreのbooksコレクションとユーザーの蔵書に追加
+const handleAddBook = async (book) => {
+  try {
+    // Step 1: 既存の書籍があるか確認
+    const booksQuery = query(
+      collection(db, "books"),
+      where("title", "==", book.title),
+      where("authors", "==", book.authors),
+      where("publishedDate", "==", book.publishedDate)
+    );
+    const querySnapshot = await getDocs(booksQuery);
 
-    await addDoc(collection(db, "books"), bookDoc);
-    alert("新しい書籍が登録されました！");
-  };
+    let bookId;
+    if (!querySnapshot.empty) {
+      // 重複する書籍が存在する場合
+      bookId = querySnapshot.docs[0].id; // 既存のドキュメントIDを取得
+      console.log("既存の書籍を使用します:", bookId);
+    } else {
+      // 重複する書籍が存在しない場合、新規追加
+      const bookDoc = {
+        title: book.title,
+        authors: book.authors,
+        publishedDate: book.publishedDate,
+        description: book.description,
+        thumbnail: book.thumbnail,
+      };
+      const bookRef = await addDoc(collection(db, "books"), bookDoc);
+      bookId = bookRef.id; // 新しい書籍のIDを取得
+      console.log("新しい書籍を追加しました:", bookId);
+    }
 
+    // Step 2: ユーザーの `userBooks` サブコレクションに書籍IDを追加
+    const userBooksRef = doc(db, "users", user.uid, "userBooks", bookId);
+    await setDoc(userBooksRef, {
+      addedAt: new Date(),
+      bookId: bookId, // 書籍IDを保存
+    });
+
+    alert("書籍がユーザーの蔵書に追加されました！");
+  } catch (error) {
+    console.error("Error adding book to user's collection: ", error);
+  }
+};
+
+
+  // 現在のページの表示用データを取得
   const currentResults = searchResults.slice(
     (currentPage - 1) * RESULTS_PER_PAGE,
     currentPage * RESULTS_PER_PAGE
   );
 
+  // ページ変更ハンドラ
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
@@ -107,6 +140,7 @@ const AddBookFromDatabasePage = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         style={{ marginBottom: "10px" }}
       />
+
       <Select
         value={sortOrder}
         onChange={handleSortChange}
@@ -148,6 +182,7 @@ const AddBookFromDatabasePage = () => {
           </ListItem>
         ))}
       </List>
+
       <Pagination
         count={Math.ceil(searchResults.length / RESULTS_PER_PAGE)}
         page={currentPage}
