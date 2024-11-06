@@ -1,20 +1,42 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { db } from "../firebaseConfig";
-import { collection, query, where, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
-import { Typography, Container, TextField, Button, List, ListItem, CardMedia, CardContent, Pagination, Select, MenuItem, Fab } from "@mui/material";
+import { useAuth } from "../context/AuthContext"; // 認証コンテキストからユーザー情報を取得
+import { db } from "../firebaseConfig"; // Firebaseのデータベース設定をインポート
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  Typography,
+  Container,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  CardMedia,
+  CardContent,
+  Pagination,
+  Select,
+  MenuItem,
+  Fab,
+} from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-// Google Books APIのURLと1ページの検索結果数を定義
+// Google Books APIのURLと1ページあたりの検索結果数
 const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes?q=";
 const RESULTS_PER_PAGE = 40;
 
+// 本をデータベースから追加するページコンポーネント
 const AddBookFromDatabasePage = () => {
-  const { user } = useAuth(); // 認証コンテキストからユーザー情報を取得
+  const { user } = useAuth(); // 現在ログインしているユーザー情報を取得
   const [searchTerm, setSearchTerm] = useState(""); // 検索キーワードの状態
   const [searchResults, setSearchResults] = useState([]); // 検索結果の状態
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
-  const [sortOrder, setSortOrder] = useState("relevance"); // 並び順の状態
+  const [sortOrder, setSortOrder] = useState("relevance"); // ソート順の状態
 
   // Firestoreのbooksコレクションから書籍を検索
   const searchBooksInDatabase = async () => {
@@ -24,25 +46,26 @@ const AddBookFromDatabasePage = () => {
     );
     const querySnapshot = await getDocs(booksQuery);
     const books = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setSearchResults(books); // 検索結果を設定
+    setSearchResults(books); // Firestoreからの検索結果を設定
     console.log("Firestoreから書籍を取得:", querySnapshot.docs);
     return books;
   };
 
-  // Google Books APIを使って書籍を検索し、指定したソート順を適用
+  // Google Books APIを使用して書籍を検索
   const searchBooksFromGoogle = async () => {
     let allBooks = [];
     let startIndex = 0;
 
-    // Google Books APIを120件まで取得するループ
+    // Google Books APIから最大120件の結果を取得
     while (startIndex < 120) {
       const response = await fetch(
         `${GOOGLE_BOOKS_API_URL}${searchTerm}&startIndex=${startIndex}&maxResults=${RESULTS_PER_PAGE}&orderBy=${sortOrder}`
       );
       const data = await response.json();
       
-      if (!data.items || data.items.length === 0) break;
-      
+      if (!data.items || data.items.length === 0) break; // 結果がなければループを終了
+
+      // 検索結果の書籍データを取得して整理
       const books = data.items.map((item) => ({
         id: item.id + startIndex,
         title: item.volumeInfo.title,
@@ -60,16 +83,16 @@ const AddBookFromDatabasePage = () => {
     setSearchResults(allBooks); // APIからの検索結果を設定
   };
 
-  // 書籍検索ボタンがクリックされたときのハンドラ
+  // 検索ボタンがクリックされたときの処理
   const handleSearch = async () => {
     setCurrentPage(1); // ページ番号をリセット
-    const dbBooks = await searchBooksInDatabase();
+    const dbBooks = await searchBooksInDatabase(); // Firestoreでの検索
     if (dbBooks.length === 0) {
-      await searchBooksFromGoogle(); // Firestoreに書籍がなければGoogle Books APIで検索
+      await searchBooksFromGoogle(); // Firestoreに該当書籍がない場合、Google Books APIで検索
     }
   };
 
-  // 並び順が変更されたときのハンドラ
+  // ソート順が変更されたときの処理
   const handleSortChange = (event) => {
     setSortOrder(event.target.value); // ソート順を更新
   };
@@ -77,7 +100,7 @@ const AddBookFromDatabasePage = () => {
   // 書籍をFirestoreのbooksコレクションおよびユーザーの蔵書に追加
   const handleAddBook = async (book) => {
     try {
-      // Step 1: 既に存在する書籍かを確認
+      // Step 1: Firestoreのbooksコレクションに重複がないか確認
       const booksQuery = query(
         collection(db, "books"),
         where("title", "==", book.title),
@@ -88,11 +111,11 @@ const AddBookFromDatabasePage = () => {
 
       let bookId;
       if (!querySnapshot.empty) {
-        // 重複する書籍が存在する場合は既存のものを使用
+        // 既存の書籍がある場合、そのIDを使用
         bookId = querySnapshot.docs[0].id;
         console.log("既存の書籍を使用します:", bookId);
       } else {
-        // 重複する書籍が存在しない場合は新規追加
+        // 新規の書籍を追加
         const bookDoc = {
           title: book.title,
           authors: book.authors,
@@ -126,18 +149,18 @@ const AddBookFromDatabasePage = () => {
     }
   };
 
-  // 現在のページのデータを取得
+  // 現在のページに表示する書籍を取得
   const currentResults = searchResults.slice(
     (currentPage - 1) * RESULTS_PER_PAGE,
     currentPage * RESULTS_PER_PAGE
   );
 
-  // ページ番号が変更されたときのハンドラ
+  // ページ番号が変更されたときの処理
   const handlePageChange = (event, value) => {
     setCurrentPage(value); // ページ番号を更新
   };
 
-  // ページのトップにスクロールする関数
+  // ページ上部にスクロールする処理
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
