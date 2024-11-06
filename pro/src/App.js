@@ -5,7 +5,8 @@ import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import UserMake from './pages/UserMake';
-import UserSetting from './pages/UserSetting'; // UserSettingコンポーネントをインポート
+import UserSetting from './pages/UserSetting';
+import UserBookshelfPage from './pages/UserBookshelfPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -29,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserSetting />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bookshelf"
+            element={
+              <ProtectedRoute>
+                <UserBookshelfPage />
               </ProtectedRoute>
             }
           />
