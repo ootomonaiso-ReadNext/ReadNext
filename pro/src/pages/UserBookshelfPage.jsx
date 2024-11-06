@@ -3,7 +3,34 @@ import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
 import { collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { Typography, Container, Button, Grid, Card, CardContent, CardMedia, Select, MenuItem } from "@mui/material";
+import {
+  Typography,
+  Container,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Box,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { Add as AddIcon, Book as BookIcon } from "@mui/icons-material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#1976d2",
+    },
+    secondary: {
+      main: "#dc004e",
+    },
+  },
+});
 
 const UserBookshelfPage = () => {
   const { user } = useAuth();
@@ -16,7 +43,6 @@ const UserBookshelfPage = () => {
     }
   }, [user]);
 
-  // Firestoreからユーザーの蔵書を取得
   const fetchUserBooks = async () => {
     try {
       setLoading(true);
@@ -33,7 +59,7 @@ const UserBookshelfPage = () => {
           return {
             id: bookId,
             ...bookSnapshot.data(),
-            status: userBookDoc.data().status || "未読", // ステータスをデフォルト「未読」で設定
+            status: userBookDoc.data().status || "未読",
           };
         } else {
           console.warn(`書籍データが見つかりませんでした (ID: ${bookId})`);
@@ -50,13 +76,11 @@ const UserBookshelfPage = () => {
     }
   };
 
-  // Firestoreで書籍のステータスを更新
   const handleStatusChange = async (bookId, newStatus) => {
     try {
       const userBookRef = doc(db, "users", user.uid, "userBooks", bookId);
       await updateDoc(userBookRef, { status: newStatus });
 
-      // ローカル状態を更新してUIに即時反映
       setBooks((prevBooks) =>
         prevBooks.map((book) =>
           book.id === bookId ? { ...book, status: newStatus } : book
@@ -68,87 +92,116 @@ const UserBookshelfPage = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" style={{ margin: "20px 0" }}>
-        あなたの蔵書
-      </Typography>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="lg">
+        <Typography variant="h4" component="h1" gutterBottom sx={{ my: 4 }}>
+          あなたの蔵書
+        </Typography>
 
-      {/* 蔵書を追加するボタンを常に表示 */}
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/add-from-database"
-        style={{ marginBottom: "20px" }}
-      >
-        蔵書を追加する
-      </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/add-from-database"
+          startIcon={<AddIcon />}
+          sx={{ mb: 4 }}
+        >
+          蔵書を追加する
+        </Button>
 
-      {loading ? (
-        <Typography variant="body1">読み込み中...</Typography>
-      ) : books.length === 0 ? (
-        <div style={{ textAlign: "center", margin: "20px 0" }}>
-          <Typography variant="body1" color="textSecondary">
-            現在、蔵書がありません。
-          </Typography>
-        </div>
-      ) : (
-        <Grid container spacing={2} direction="column"> {/* カード全体を縦に並べる */}
-          {books.map((book) => (
-            <Grid item xs={12} key={book.id}>
-              <Card style={{ display: "flex", height: "150px" }}>
-                {/* サムネイル画像を左側に配置 */}
-                {book.thumbnail && (
+        {loading ? (
+          <Box display="flex" justifyContent="center" my={8}>
+            <CircularProgress />
+          </Box>
+        ) : books.length === 0 ? (
+          <Box textAlign="center" my={8}>
+            <Typography variant="body1" color="textSecondary">
+              現在、蔵書がありません。
+            </Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {books.map((book) => (
+              <Grid item xs={12} key={book.id}>
+                <Card sx={{ display: "flex", height: "150px" }}> {/* 横並びレイアウト */}
                   <CardMedia
-                    component="img"
-                    image={book.thumbnail}
-                    alt={book.title}
-                    style={{
-                      width: 100, // 固定幅を設定
-                      objectFit: "contain",
-                    }}
-                  />
-                )}
-
-                {/* 書籍情報とステータス選択を右側に配置 */}
-                <CardContent style={{ flex: "1", padding: "10px" }}>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
+                    sx={{
+                      width: 100,
+                      height: 150,
+                      position: "relative",
+                      bgcolor: book.thumbnail ? "transparent" : "grey.200",
                     }}
                   >
-                    {book.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {book.authors ? book.authors.join(", ") : "著者情報なし"}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {book.publishedDate ? `発行年: ${book.publishedDate}` : ""}
-                  </Typography>
+                    {book.thumbnail ? (
+                      <img
+                        src={book.thumbnail}
+                        alt={book.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "100%",
+                          width: "100%",
+                        }}
+                      >
+                        <BookIcon sx={{ fontSize: 60, color: "grey.400" }} />
+                      </Box>
+                    )}
+                  </CardMedia>
 
-                  {/* ステータス選択メニュー */}
-                  <Select
-                    value={book.status}
-                    onChange={(e) => handleStatusChange(book.id, e.target.value)}
-                    fullWidth
-                    variant="outlined"
-                    style={{ marginTop: "10px" }}
-                  >
-                    <MenuItem value="未読">未読</MenuItem>
-                    <MenuItem value="読書中">読書中</MenuItem>
-                    <MenuItem value="読了済み">読了済み</MenuItem>
-                  </Select>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </Container>
+                  <CardContent sx={{ flex: "1", padding: "10px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <Box>
+                      <Typography
+                        gutterBottom
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {book.title}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {book.authors ? book.authors.join(", ") : "著者情報なし"}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {book.publishedDate ? `発行年: ${book.publishedDate}` : ""}
+                      </Typography>
+                    </Box>
+
+                    {/* ステータス選択メニューの調整 */}
+                    <FormControl fullWidth sx={{ mt: 1, mb: 1 }} size="small"> {/* 上下にマージンを追加 */}
+                      <InputLabel id={`status-select-label-${book.id}`}>ステータス</InputLabel>
+                      <Select
+                        labelId={`status-select-label-${book.id}`}
+                        value={book.status}
+                        onChange={(e) => handleStatusChange(book.id, e.target.value)}
+                        label="ステータス"
+                        sx={{ width: "120px" }}
+                      >
+                        <MenuItem value="未読">未読</MenuItem>
+                        <MenuItem value="読書中">読書中</MenuItem>
+                        <MenuItem value="読了済み">読了済み</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Container>
+    </ThemeProvider>
   );
 };
 
