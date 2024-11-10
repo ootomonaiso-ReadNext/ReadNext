@@ -8,6 +8,9 @@ import UserMake from './pages/UserMake';
 import UserSetting from './pages/UserSetting';
 import UserBookshelfPage from './pages/UserBookshelfPage';
 import AddBookFromDatabasePage from './pages/AddBookFromDatabasePage';
+import BookSearchPage from './pages/BookSearchPage'; 
+import ThreadListPage from './pages/ThreadListPage';
+import NewThreadPage from "./pages/NewThreadPage"; 
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -47,6 +50,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <AddBookFromDatabasePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book-search"
+            element={
+              <ProtectedRoute>
+                <BookSearchPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/books/:bookId/threads"
+            element={
+              <ProtectedRoute>
+                <ThreadListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/books/:bookId/new-thread"
+            element={
+              <ProtectedRoute>
+                <NewThreadPage />
               </ProtectedRoute>
             }
           />
