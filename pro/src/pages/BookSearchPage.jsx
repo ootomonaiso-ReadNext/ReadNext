@@ -16,7 +16,7 @@ const BookSearchPage = () => {
       const querySnapshot = await getDocs(booksRef);
       const allBooks = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setBooks(allBooks);
-      setFilteredBooks(allBooks); // 初期状態ではすべての本を表示
+      setFilteredBooks(allBooks);
     };
 
     fetchBooks();
