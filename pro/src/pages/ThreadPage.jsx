@@ -75,7 +75,7 @@ const ThreadPage = () => {
       setNewComment("");
       setReplyTo(null); // 返信をリセット
       setQuote(null); // 引用をリセット
-      fetchComments(); // コメントを追加後にコメント一覧を更新
+      fetchComments();　// コメント一覧を再取得
     } catch (error) {
       console.error("Error adding comment:", error);
     }
