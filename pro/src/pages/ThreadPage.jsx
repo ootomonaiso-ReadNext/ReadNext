@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Box, Container, Typography, List, ListItem, ListItemText, TextField, Button } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
@@ -18,7 +18,30 @@ const ThreadPage = () => {
   const fetchComments = useCallback(async () => {
     const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
     const commentSnapshot = await getDocs(commentsRef);
-    const commentList = commentSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    
+    // 各コメントに対してデータ取得
+    const commentList = await Promise.all(commentSnapshot.docs.map(async (docSnap) => {
+      const commentData = { id: docSnap.id, ...docSnap.data() };
+      
+      // ユーザーの読書状況（status）を取得
+      if (commentData.userId) {
+        try {
+          const statusDocRef = doc(db, `users/${commentData.userId}/userBooks`, bookId); // userIdとbookIdで指定
+          const statusDoc = await getDoc(statusDocRef);
+          
+          // statusが存在する場合はcommentDataに追加
+          commentData.status = statusDoc.exists() ? statusDoc.data().status : "蔵書にない";
+        } catch (error) {
+          console.error(`Error fetching status for user ${commentData.userId}:`, error);
+          commentData.status = "取得エラー";
+        }
+      } else {
+        commentData.status = "未設定";
+      }
+
+      return commentData;
+    }));
+
     setComments(commentList);
   }, [bookId, threadId]);
 
@@ -90,7 +113,7 @@ const ThreadPage = () => {
                 primary={
                   <>
                     <Typography variant="subtitle2">
-                      {comment.createdBy}
+                      {comment.createdBy} {comment.status && `（読書状況: ${comment.status}）`}
                     </Typography>
                     {comment.quote && (
                       <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
