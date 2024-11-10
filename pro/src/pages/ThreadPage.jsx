@@ -8,9 +8,11 @@ import { useAuth } from "../context/AuthContext";
 const ThreadPage = () => {
   const { bookId, threadId } = useParams();
   const { user } = useAuth();
-  const [thread, setThread] = useState(null); // スレッドの詳細
-  const [comments, setComments] = useState([]); // コメント一覧
-  const [newComment, setNewComment] = useState(""); // 新しいコメントの内容
+  const [thread, setThread] = useState(null); 
+  const [comments, setComments] = useState([]); 
+  const [newComment, setNewComment] = useState("");
+  const [replyTo, setReplyTo] = useState(null); // 返信先コメントのID
+  const [quote, setQuote] = useState(null); // 安価として引用するコメント内容
 
   // コメント一覧を取得
   const fetchComments = useCallback(async () => {
@@ -31,7 +33,7 @@ const ThreadPage = () => {
 
     fetchThread();
     fetchComments();
-  }, [bookId, threadId, fetchComments]);
+  }, [bookId, threadId, fetchComments]); // fetchCommentsを依存配列に追加
 
   // コメントを追加する関数
   const handleAddComment = async () => {
@@ -42,13 +44,30 @@ const ThreadPage = () => {
       await addDoc(commentsRef, {
         text: newComment,
         createdBy: user?.userName || "匿名ユーザー",
+        userId: user?.uid, // userIdを保存するが表示はしない
         createdAt: serverTimestamp(),
+        replyTo: replyTo || null, // 返信先のコメントID
+        quote: quote || null, // 引用するコメント内容
       });
       setNewComment("");
+      setReplyTo(null); // 返信をリセット
+      setQuote(null); // 引用をリセット
       fetchComments(); // コメントを追加後にコメント一覧を更新
     } catch (error) {
       console.error("Error adding comment:", error);
     }
+  };
+
+  // コメントを引用（安価）する
+  const handleQuote = (comment) => {
+    setQuote(comment.text); // 引用するコメントの内容を設定
+    setReplyTo(comment.id); // 返信先コメントのIDを設定
+  };
+
+  // 返信・引用をキャンセルする関数
+  const handleCancelReply = () => {
+    setReplyTo(null);
+    setQuote(null);
   };
 
   if (!thread) {
@@ -66,15 +85,39 @@ const ThreadPage = () => {
         <Typography variant="h6" gutterBottom>コメント</Typography>
         <List>
           {comments.map((comment) => (
-            <ListItem key={comment.id}>
-              <ListItemText primary={comment.text} secondary={`作成者: ${comment.createdBy}`} />
+            <ListItem key={comment.id} alignItems="flex-start">
+              <ListItemText
+                primary={
+                  <>
+                    <Typography variant="subtitle2">
+                      {comment.createdBy}
+                    </Typography>
+                    {comment.quote && (
+                      <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
+                        {`引用: "${comment.quote}"`}
+                      </Typography>
+                    )}
+                    <Typography variant="body1">{comment.text}</Typography>
+                  </>
+                }
+                secondary={`送信日時: ${comment.createdAt?.toDate().toLocaleString()}`}
+              />
+              <Button size="small" onClick={() => handleQuote(comment)}>
+                引用
+              </Button>
             </ListItem>
           ))}
         </List>
 
+        {/* 新しいコメント入力 */}
         <Box sx={{ mt: 4 }}>
+          {quote && (
+            <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
+              {`引用: "${quote}"`}
+            </Typography>
+          )}
           <TextField
-            label="コメントを入力"
+            label="コメントを入力 (1200字まで)"
             variant="outlined"
             fullWidth
             multiline
@@ -82,10 +125,16 @@ const ThreadPage = () => {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             sx={{ mb: 2 }}
+            inputProps={{ maxLength: 1200 }}
           />
           <Button variant="contained" color="primary" onClick={handleAddComment}>
             コメントを追加
           </Button>
+          {replyTo && (
+            <Button variant="text" color="secondary" onClick={handleCancelReply}>
+              返信をキャンセル
+            </Button>
+          )}
         </Box>
       </Box>
     </Container>
