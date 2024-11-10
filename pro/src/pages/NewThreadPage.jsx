@@ -1,33 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { Box, Container, TextField, Button, Typography } from "@mui/material";
+import { Box, Container, TextField, Button, Typography, CircularProgress } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
 
 const NewThreadPage = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth(); // AuthContext から user を取得
   const [title, setTitle] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
+  const [loading, setLoading] = useState(true); // ユーザー情報のロードを追跡する状態
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setLoading(false);
+    }
+  }, [user]);
 
   const handleCreateThread = async () => {
-    if (!title || !createdBy) return;
+    if (!title || !user?.userName) return;
 
     try {
-      // 指定された bookId の本に threads コレクションを作成して追加
       const threadsRef = collection(db, `books/${bookId}/threads`);
       await addDoc(threadsRef, {
         title: title,
-        createdBy: createdBy,
+        createdBy: user.userName,
         createdAt: serverTimestamp(),
       });
-
-      // スレッド作成後にスレッド一覧ページにリダイレクト
       navigate(`/books/${bookId}/threads`);
     } catch (error) {
-      console.error("スレッドの作成中にエラーが発生しました:", error);
+      console.error("Error creating thread:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -41,15 +56,12 @@ const NewThreadPage = () => {
           onChange={(e) => setTitle(e.target.value)}
           sx={{ mb: 2 }}
         />
-        <TextField
-          label="作成者"
-          variant="outlined"
-          fullWidth
-          value={createdBy}
-          onChange={(e) => setCreatedBy(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-        <Button variant="contained" color="primary" onClick={handleCreateThread}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreateThread}
+          disabled={!user?.userName}
+        >
           作成
         </Button>
       </Box>
