@@ -153,6 +153,22 @@ const HomePage = () => {
                 >
                   本棚へ移動
                 </Button>
+                <Button
+                  component={Link}
+                  to="/book-search"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                    fontWeight: "bold",
+                    mt: 2,
+                  }}
+                >
+                  本を検索
+                </Button>
               </CardActions>
             </Card>
           </Grid>

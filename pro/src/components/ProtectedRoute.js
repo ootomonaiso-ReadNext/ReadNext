@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
 
   // サービスアカウントが存在するか確認中はローディング表示
   if (hasServiceAccount === null) {
-    return <p>Loading...</p>;
+    return <p>なうろうでんぐ</p>;
   }
 
   // サービスアカウントが存在する場合のみ子コンポーネントを表示
