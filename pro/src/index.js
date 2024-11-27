@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom'; // よく知らんけどReactはブラウザルーターのこと嫌いらしいよ
 import App from './App';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
