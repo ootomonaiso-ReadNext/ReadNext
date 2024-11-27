@@ -45,7 +45,10 @@ const AddBookFromDatabasePage = () => {
       where("title", "==", searchTerm)
     );
     const querySnapshot = await getDocs(booksQuery);
-    const books = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const books = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     setSearchResults(books); // Firestoreからの検索結果を設定
     console.log("Firestoreから書籍を取得:", querySnapshot.docs);
     return books;
@@ -58,22 +61,24 @@ const AddBookFromDatabasePage = () => {
 
     // Google Books APIから最大120件の結果を取得
     while (startIndex < 120) {
+      const currentStartIndex = startIndex; // スコープを固定
       const response = await fetch(
-        `${GOOGLE_BOOKS_API_URL}${searchTerm}&startIndex=${startIndex}&maxResults=${RESULTS_PER_PAGE}&orderBy=${sortOrder}`
+        `${GOOGLE_BOOKS_API_URL}${searchTerm}&startIndex=${currentStartIndex}&maxResults=${RESULTS_PER_PAGE}&orderBy=${sortOrder}`
       );
       const data = await response.json();
-      
+
       if (!data.items || data.items.length === 0) break; // 結果がなければループを終了
 
       // 検索結果の書籍データを取得して整理
       const books = data.items.map((item) => ({
-        id: item.id + startIndex,
+        id: `${item.id}-${currentStartIndex}`,
         title: item.volumeInfo.title,
         authors: item.volumeInfo.authors || ["不明"],
         publishedDate: item.volumeInfo.publishedDate || "不明",
         description: item.volumeInfo.description || "説明なし",
         thumbnail: item.volumeInfo.imageLinks?.thumbnail || null,
       }));
+
       allBooks = [...allBooks, ...books];
       startIndex += RESULTS_PER_PAGE;
 
@@ -95,58 +100,6 @@ const AddBookFromDatabasePage = () => {
   // ソート順が変更されたときの処理
   const handleSortChange = (event) => {
     setSortOrder(event.target.value); // ソート順を更新
-  };
-
-  // 書籍をFirestoreのbooksコレクションおよびユーザーの蔵書に追加
-  const handleAddBook = async (book) => {
-    try {
-      // Step 1: Firestoreのbooksコレクションに重複がないか確認
-      const booksQuery = query(
-        collection(db, "books"),
-        where("title", "==", book.title),
-        where("authors", "==", book.authors),
-        where("publishedDate", "==", book.publishedDate)
-      );
-      const querySnapshot = await getDocs(booksQuery);
-
-      let bookId;
-      if (!querySnapshot.empty) {
-        // 既存の書籍がある場合、そのIDを使用
-        bookId = querySnapshot.docs[0].id;
-        console.log("既存の書籍を使用します:", bookId);
-      } else {
-        // 新規の書籍を追加
-        const bookDoc = {
-          title: book.title,
-          authors: book.authors,
-          publisher: book.publisher || "不明",
-          publishedDate: book.publishedDate,
-          description: book.description || "説明なし",
-          pageCount: book.pageCount || 0,
-          categories: book.categories || [],
-          averageRating: book.averageRating || null,
-          ratingsCount: book.ratingsCount || 0,
-          language: book.language || "不明",
-          previewLink: book.previewLink || null,
-          infoLink: book.infoLink || null,
-          thumbnail: book.thumbnail || null,
-        };
-        const bookRef = await addDoc(collection(db, "books"), bookDoc);
-        bookId = bookRef.id; // 新しい書籍のIDを取得
-        console.log("新しい書籍を追加しました:", bookId);
-      }
-
-      // Step 2: ユーザーの `userBooks` サブコレクションに書籍IDを追加
-      const userBooksRef = doc(db, "users", user.uid, "userBooks", bookId);
-      await setDoc(userBooksRef, {
-        addedAt: new Date(),
-        bookId: bookId, 
-      });
-
-      alert("書籍がユーザーの蔵書に追加されました！");
-    } catch (error) {
-      console.error("Error adding book to user's collection: ", error);
-    }
   };
 
   // 現在のページに表示する書籍を取得
@@ -215,7 +168,10 @@ const AddBookFromDatabasePage = () => {
       {/* 検索結果のリスト */}
       <List>
         {currentResults.map((book, index) => (
-          <ListItem key={`${book.id}-${index}`} style={{ display: "flex", alignItems: "center" }}>
+          <ListItem
+            key={`${book.id}-${index}`}
+            style={{ display: "flex", alignItems: "center" }}
+          >
             {book.thumbnail && (
               <CardMedia
                 component="img"
@@ -229,22 +185,16 @@ const AddBookFromDatabasePage = () => {
               <Typography variant="body2" color="textSecondary">
                 {book.authors.join(", ")}
               </Typography>
-              <Button onClick={() => handleAddBook(book)} color="primary" style={{ marginTop: "10px" }}>
+              <Button
+                color="primary"
+                style={{ marginTop: "10px" }}
+              >
                 追加
               </Button>
             </CardContent>
           </ListItem>
         ))}
       </List>
-
-      {/* ページネーション */}
-      <Pagination
-        count={Math.ceil(searchResults.length / RESULTS_PER_PAGE)}
-        page={currentPage}
-        onChange={handlePageChange}
-        color="primary"
-        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
-      />
 
       {/* ページ上部へ戻るボタン */}
       <Fab
