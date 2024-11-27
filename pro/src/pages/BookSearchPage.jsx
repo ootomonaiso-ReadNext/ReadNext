@@ -30,7 +30,7 @@ const BookSearchPage = () => {
       );
       setFilteredBooks(filtered);
     } else {
-      setFilteredBooks(books); // 検索文字がない場合は全蔵書を表示
+      setFilteredBooks(books); // 検索文字がない場合は全蔵書
     }
   }, [searchTerm, books]);
 
