@@ -8,7 +8,6 @@ import {
   Button,
   Typography,
   Box,
-  Divider,
 } from "@mui/material";
 import GoogleIcon from '@mui/icons-material/Google'; // Googleアイコンの追加
 
@@ -56,10 +55,10 @@ const Login = () => {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          Login
+          ログイン
         </Typography>
         <TextField
-          label="Email"
+          label="Eメール"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -67,7 +66,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
-          label="Password"
+          label="パスワード"
           variant="outlined"
           type="password"
           fullWidth
@@ -82,9 +81,8 @@ const Login = () => {
           sx={{ mt: 2, mb: 1 }}
           onClick={handleEmailLogin}
         >
-          Login with Email
+          電子メールでログイン
         </Button>
-        <Divider sx={{ my: 2 }}>or</Divider>
         <Button
           variant="outlined"
           color="secondary"
@@ -93,7 +91,7 @@ const Login = () => {
           onClick={handleGoogleLogin}
           sx={{ mb: 2 }}
         >
-          Login with Google
+          Googleでログイン
         </Button>
         <Button
           variant="text"
@@ -101,7 +99,7 @@ const Login = () => {
           fullWidth
           onClick={navigateToRegister}
         >
-          Create a new account
+          新規アカウント登録
         </Button>
       </Box>
     </Container>

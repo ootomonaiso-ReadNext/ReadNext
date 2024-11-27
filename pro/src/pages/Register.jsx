@@ -54,11 +54,11 @@ const Register = () => {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          Register
+          新規アカウント登録
         </Typography>
         {error && <Alert severity="error" sx={{ width: "100%", mb: 2 }}>{error}</Alert>}
         <TextField
-          label="Email"
+          label="Eメール"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -66,7 +66,7 @@ const Register = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
-          label="Password"
+          label="パスワード"
           variant="outlined"
           type="password"
           fullWidth
@@ -75,7 +75,7 @@ const Register = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <TextField
-          label="User ID (Unique)"
+          label="ユーザーID"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -83,7 +83,7 @@ const Register = () => {
           onChange={(e) => setUserId(e.target.value)}
         />
         <TextField
-          label="User Name"
+          label="ユーザーネーム"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -97,7 +97,7 @@ const Register = () => {
           sx={{ mt: 2 }}
           onClick={handleSignUp}
         >
-          Sign Up
+          サインアップ
         </Button>
       </Box>
     </Container>
