@@ -6,9 +6,6 @@ import {
   query,
   where,
   getDocs,
-  addDoc,
-  doc,
-  setDoc,
 } from "firebase/firestore";
 import {
   Typography,
