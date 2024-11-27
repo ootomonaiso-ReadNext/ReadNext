@@ -29,7 +29,7 @@ const RESULTS_PER_PAGE = 40;
 
 // 本をデータベースから追加するページコンポーネント
 const AddBookFromDatabasePage = () => {
-  const { user } = useAuth(); // 現在ログインしているユーザー情報を取得
+//  const { user } = useAuth(); // 現在ログインしているユーザー情報を取得
   const [searchTerm, setSearchTerm] = useState(""); // 検索キーワードの状態
   const [searchResults, setSearchResults] = useState([]); // 検索結果の状態
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
