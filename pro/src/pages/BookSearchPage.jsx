@@ -4,6 +4,7 @@ import { db } from "../firebaseConfig";
 import { Link } from "react-router-dom";
 import { Box, Container, TextField, Typography, List, ListItem, ListItemText } from "@mui/material";
 
+// 本を検索するページ
 const BookSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [books, setBooks] = useState([]);

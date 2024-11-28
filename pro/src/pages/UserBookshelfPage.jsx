@@ -21,6 +21,7 @@ import {
 import { Add as AddIcon, Book as BookIcon } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+// ユーザーの蔵書一覧を表示するページ
 const theme = createTheme({
   palette: {
     primary: { main: "#1976d2" },

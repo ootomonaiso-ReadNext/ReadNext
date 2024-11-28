@@ -1,4 +1,3 @@
-// src/pages/Register.js
 import React, { useState } from "react";
 import { signUpWithEmail } from "../services/authService";
 import { createUserDocument } from "../services/userService";
@@ -6,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
 
+// 新規アカウント登録ページ
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

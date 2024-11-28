@@ -5,6 +5,7 @@ import { db } from "../firebaseConfig";
 import { Box, Container, Typography, List, ListItem, ListItemText, TextField, Button } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
+// スレッドページ
 const ThreadPage = () => {
   const { bookId, threadId } = useParams();
   const { user } = useAuth();

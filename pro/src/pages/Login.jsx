@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import GoogleIcon from '@mui/icons-material/Google'; // Googleアイコンの追加
 
+// ログインページ
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

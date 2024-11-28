@@ -5,6 +5,7 @@ import { db } from "../firebaseConfig";
 import { Box, Container, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
+// 新しいスレッドを作成するページ
 const NewThreadPage = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();

@@ -15,6 +15,7 @@ import {
   CardContent,
 } from "@mui/material";
 
+// スレッド一覧ページ
 const ThreadListPage = () => {
   const { bookId } = useParams();
   const [threads, setThreads] = useState([]);
