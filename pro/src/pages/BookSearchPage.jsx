@@ -1,115 +1,230 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import React, { useState } from "react";
+import { db } from "../firebaseConfig"; // Firebaseのデータベース設定をインポート
 import {
-  Box,
-  Container,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+} from "firebase/firestore";
+import {
   Typography,
+  Container,
+  TextField,
+  Button,
   List,
   ListItem,
-  ListItemText,
-  Button,
-  Card,
   CardMedia,
   CardContent,
+  Pagination,
+  Select,
+  MenuItem,
+  Fab,
 } from "@mui/material";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Layout from "../components/Layout"; // Layoutをインポート
 
-// スレッド一覧ページ
-const ThreadListPage = () => {
-  const { bookId } = useParams();
-  const [threads, setThreads] = useState([]);
-  const [book, setBook] = useState(null);
-  const [loading, setLoading] = useState(true);
+const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes?q=";
+const RESULTS_PER_PAGE = 40;
 
-  // Firestoreからスレッド一覧を取得
-  useEffect(() => {
-    const fetchThreads = async () => {
-      const threadsRef = collection(db, `books/${bookId}/threads`);
-      const threadSnapshot = await getDocs(threadsRef);
-      const threadList = threadSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setThreads(threadList);
-    };
+const AddBookFromDatabasePage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState("relevance");
 
-    const fetchBookDetails = async () => {
-      const bookRef = doc(db, "books", bookId);
-      const bookDoc = await getDoc(bookRef);
-      if (bookDoc.exists()) {
-        setBook({ id: bookDoc.id, ...bookDoc.data() });
-      }
-      setLoading(false);
-    };
-
-    fetchThreads();
-    fetchBookDetails();
-  }, [bookId]);
-
-  if (loading) {
-    return (
-      <Layout>
-        <Container maxWidth="md" sx={{ mt: 4 }}>
-          <Typography variant="h6" align="center">読み込み中...</Typography>
-        </Container>
-      </Layout>
+  const searchBooksInDatabase = async () => {
+    const booksQuery = query(
+      collection(db, "books"),
+      where("title", "==", searchTerm)
     );
-  }
+    const querySnapshot = await getDocs(booksQuery);
+    const books = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setSearchResults(books);
+    console.log("Firestoreから書籍を取得:", querySnapshot.docs);
+    return books;
+  };
+
+  const searchBooksFromGoogle = async () => {
+    let allBooks = [];
+    let startIndex = 0;
+
+    while (startIndex < 120) {
+      const currentStartIndex = startIndex;
+      const response = await fetch(
+        `${GOOGLE_BOOKS_API_URL}${searchTerm}&startIndex=${currentStartIndex}&maxResults=${RESULTS_PER_PAGE}&orderBy=${sortOrder}`
+      );
+      const data = await response.json();
+
+      if (!data.items || data.items.length === 0) break;
+
+      const books = data.items.map((item) => ({
+        id: `${item.id}-${currentStartIndex}`,
+        title: item.volumeInfo.title || "不明",
+        authors: item.volumeInfo.authors || ["不明"],
+        averageRating: item.volumeInfo.averageRating || null,
+        categories: item.volumeInfo.categories || ["不明"],
+        description: item.volumeInfo.description || "説明なし",
+        infoLink: item.volumeInfo.infoLink || null,
+        language: item.volumeInfo.language || "不明",
+        pageCount: item.volumeInfo.pageCount || 0,
+        previewLink: item.volumeInfo.previewLink || null,
+        publishedDate: item.volumeInfo.publishedDate || "不明",
+        ratingsCount: item.volumeInfo.ratingsCount || 0,
+        thumbnail: item.volumeInfo.imageLinks?.thumbnail || null,
+      }));
+
+      allBooks = [...allBooks, ...books];
+      startIndex += RESULTS_PER_PAGE;
+
+      if (allBooks.length >= data.totalItems) break;
+    }
+
+    setSearchResults(allBooks);
+  };
+
+  const addBookToDatabase = async (book) => {
+    try {
+      const booksCollection = collection(db, "books");
+      await addDoc(booksCollection, {
+        title: book.title,
+        authors: book.authors,
+        averageRating: book.averageRating,
+        categories: book.categories,
+        description: book.description,
+        infoLink: book.infoLink,
+        language: book.language,
+        pageCount: book.pageCount,
+        previewLink: book.previewLink,
+        publishedDate: book.publishedDate,
+        ratingsCount: book.ratingsCount,
+        thumbnail: book.thumbnail,
+      });
+      alert("書籍が追加されました！");
+    } catch (error) {
+      console.error("書籍の追加中にエラーが発生しました:", error);
+      alert("書籍の追加に失敗しました。");
+    }
+  };
+
+  const handleSearch = async () => {
+    setCurrentPage(1);
+    const dbBooks = await searchBooksInDatabase();
+    if (dbBooks.length === 0) {
+      await searchBooksFromGoogle();
+    }
+  };
+
+  const handleSortChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
+  const currentResults = searchResults.slice(
+    (currentPage - 1) * RESULTS_PER_PAGE,
+    currentPage * RESULTS_PER_PAGE
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <Layout>
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        {/* 本の情報を表示するヘッダー */}
-        {book && (
-          <Card sx={{ display: "flex", mb: 4 }}>
-            <CardMedia
-              component="img"
-              sx={{ width: 150 }}
-              image={book.thumbnail}
-              alt={book.title}
-            />
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {book.title}
-              </Typography>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                著者: {book.authors}
-              </Typography>
-              <Typography variant="body1">{book.description}</Typography>
-            </CardContent>
-          </Card>
-        )}
+      <Container maxWidth="sm">
+        <Typography variant="h5" style={{ margin: "20px 0" }}>
+          書籍を検索して追加
+        </Typography>
 
-        {/* スレッド一覧 */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>スレッド一覧</Typography>
-          <Button
-            variant="contained"
-            component={Link}
-            to={`/books/${bookId}/new-thread`}
-            color="primary"
-            sx={{ mb: 2 }}
-          >
-            新しいスレッドを作成
-          </Button>
-          <List>
-            {threads.map((thread) => (
-              <ListItem
-                key={thread.id}
-                component={Link}
-                to={`/books/${bookId}/threads/${thread.id}/comments`}
-                button
-              >
-                <ListItemText primary={thread.title} secondary={`作成者: ${thread.createdBy}`} />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        <TextField
+          label="書籍を検索"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ marginBottom: "10px" }}
+        />
+
+        <Select
+          value={sortOrder}
+          onChange={handleSortChange}
+          style={{ marginBottom: "20px", width: "100%" }}
+        >
+          <MenuItem value="relevance">関連順</MenuItem>
+          <MenuItem value="newest">新着順</MenuItem>
+        </Select>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSearch}
+          style={{ marginBottom: "20px" }}
+        >
+          検索
+        </Button>
+
+        <Pagination
+          count={Math.ceil(searchResults.length / RESULTS_PER_PAGE)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+        />
+
+        <List>
+          {currentResults.map((book, index) => (
+            <ListItem
+              key={`${book.id}-${index}`}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {book.thumbnail && (
+                <CardMedia
+                  component="img"
+                  image={book.thumbnail}
+                  alt={book.title}
+                  style={{ width: 60, height: 90, marginRight: "10px" }}
+                />
+              )}
+              <CardContent>
+                <Typography variant="body1">{book.title}</Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {book.authors.join(", ")}
+                </Typography>
+                <Button
+                  color="primary"
+                  style={{ marginTop: "10px" }}
+                  onClick={() => addBookToDatabase(book)}
+                >
+                  追加
+                </Button>
+              </CardContent>
+            </ListItem>
+          ))}
+        </List>
+
+        <Fab
+          color="primary"
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <KeyboardArrowUpIcon />
+        </Fab>
       </Container>
     </Layout>
   );
 };
 
-export default ThreadListPage;
+export default AddBookFromDatabasePage;
