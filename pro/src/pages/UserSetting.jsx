@@ -4,6 +4,7 @@ import { updateProfile } from "firebase/auth";
 import { db } from "../firebaseConfig"; // Firestoreの初期化ファイルをインポート
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore操作のための関数をインポート
 import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
+import Layout from "../components/Layout"; // これはヘッダー
 
 // ユーザー設定ページ
 const UserSetting = () => {
@@ -53,35 +54,37 @@ const UserSetting = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Box sx={{ p: 3, boxShadow: 2, borderRadius: 2, textAlign: "center" }}>
-        <Typography variant="h5" gutterBottom>
-          ゆーざーせってぃんぐ
-        </Typography>
-        <TextField
-          label="Username"
-          value={username}
-          onChange={handleUsernameChange}
-          variant="outlined"
-          fullWidth
-          margin="normal"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          変更を保存
-        </Button>
-        {message && (
-          <Alert severity="success" sx={{ mt: 2 }}>
-            {message}
-          </Alert>
-        )}
-      </Box>
-    </Container>
+    <Layout>
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Box sx={{ p: 3, boxShadow: 2, borderRadius: 2, textAlign: "center" }}>
+          <Typography variant="h5" gutterBottom>
+            ゆーざーせってぃんぐ
+          </Typography>
+          <TextField
+            label="Username"
+            value={username}
+            onChange={handleUsernameChange}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            変更を保存
+          </Button>
+          {message && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {message}
+            </Alert>
+          )}
+        </Box>
+      </Container>
+    </Layout>
   );
 };
 

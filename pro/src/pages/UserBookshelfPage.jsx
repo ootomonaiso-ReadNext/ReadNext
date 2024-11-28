@@ -19,16 +19,9 @@ import {
   InputLabel,
 } from "@mui/material";
 import { Add as AddIcon, Book as BookIcon } from "@mui/icons-material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Layout from "../components/Layout"; // Layoutをインポート
 
 // ユーザーの蔵書一覧を表示するページ
-const theme = createTheme({
-  palette: {
-    primary: { main: "#1976d2" },
-    secondary: { main: "#dc004e" },
-  },
-});
-
 const UserBookshelfPage = () => {
   const { user } = useAuth();
   const [books, setBooks] = useState([]);
@@ -87,7 +80,7 @@ const UserBookshelfPage = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <Layout>
       <Container maxWidth="lg">
         <Typography variant="h4" component="h1" gutterBottom sx={{ my: 4 }}>
           あなたの蔵書
@@ -152,7 +145,15 @@ const UserBookshelfPage = () => {
                     )}
                   </CardMedia>
 
-                  <CardContent sx={{ flex: "1", padding: "10px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <CardContent
+                    sx={{
+                      flex: "1",
+                      padding: "10px 16px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <Box>
                       <Typography
                         gutterBottom
@@ -170,16 +171,22 @@ const UserBookshelfPage = () => {
                         {book.authors ? book.authors.join(", ") : "著者情報なし"}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
-                        {book.publishedDate ? `発行年: ${book.publishedDate}` : ""}
+                        {book.publishedDate
+                          ? `発行年: ${book.publishedDate}`
+                          : ""}
                       </Typography>
                     </Box>
 
                     <FormControl fullWidth sx={{ mt: 1, mb: 1 }} size="small">
-                      <InputLabel id={`status-select-label-${book.id}`}>ステータス</InputLabel>
+                      <InputLabel id={`status-select-label-${book.id}`}>
+                        ステータス
+                      </InputLabel>
                       <Select
                         labelId={`status-select-label-${book.id}`}
                         value={book.status}
-                        onChange={(e) => handleStatusChange(book.id, e.target.value)}
+                        onChange={(e) =>
+                          handleStatusChange(book.id, e.target.value)
+                        }
                         label="ステータス"
                         sx={{ width: "120px" }}
                       >
@@ -195,7 +202,7 @@ const UserBookshelfPage = () => {
           </Grid>
         )}
       </Container>
-    </ThemeProvider>
+    </Layout>
   );
 };
 

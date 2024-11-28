@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Link } from "react-router-dom";
 import { Box, Container, TextField, Typography, List, ListItem, ListItemText } from "@mui/material";
+import Layout from "../components/Layout"; // Layoutをインポート
 
 // 本を検索するページ
 const BookSearchPage = () => {
@@ -36,28 +37,30 @@ const BookSearchPage = () => {
   }, [searchTerm, books]);
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          本を検索!
-        </Typography>
-        <TextField
-          label="本のタイトルを入力"
-          variant="outlined"
-          fullWidth
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </Box>
+    <Layout>
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            本を検索!
+          </Typography>
+          <TextField
+            label="本のタイトルを入力"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </Box>
 
-      <List>
-        {filteredBooks.map((book) => (
-          <ListItem key={book.id} component={Link} to={`/books/${book.id}/threads`} button>
-            <ListItemText primary={book.title} secondary={book.authors} />
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+        <List>
+          {filteredBooks.map((book) => (
+            <ListItem key={book.id} component={Link} to={`/books/${book.id}/threads`} button>
+              <ListItemText primary={book.title} secondary={book.authors} />
+            </ListItem>
+          ))}
+        </List>
+      </Container>
+    </Layout>
   );
 };
 
