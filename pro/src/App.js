@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Routerのインポートを削除
+import { Routes, Route } from 'react-router-dom'; 
 import { AuthProvider } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
@@ -10,7 +10,7 @@ import AddBookFromDatabasePage from './pages/AddBookFromDatabasePage';
 import BookSearchPage from './pages/BookSearchPage'; 
 import ThreadListPage from './pages/ThreadListPage';
 import NewThreadPage from "./pages/NewThreadPage";
-import ThreadPage from "./pages/ThreadPage"; // ThreadPage をインポート
+import ThreadPage from "./pages/ThreadPage"; 
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
