@@ -4,6 +4,7 @@ import { createUserDocument } from "../services/userService";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+// Googleアカウントでログインしたユーザーにサービスアカウントを作成するページ
 const UserMake = () => {
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");

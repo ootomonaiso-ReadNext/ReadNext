@@ -27,6 +27,7 @@ import {
 } from "@mui/icons-material";
 import defaultAvatar from "../img/deficon.png";
 
+// ホームページ
 const HomePage = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();

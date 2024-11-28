@@ -5,6 +5,7 @@ import { db } from "../firebaseConfig"; // Firestoreの初期化ファイルを�
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore操作のための関数をインポート
 import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
 
+// ユーザー設定ページ
 const UserSetting = () => {
   const { user, setUser } = useAuth();
   const [username, setUsername] = useState("");
