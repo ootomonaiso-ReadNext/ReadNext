@@ -1,69 +1,34 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { logout } from "../services/authService";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   Avatar,
   Button,
-  AppBar,
-  Toolbar,
-  Typography,
   Container,
   Card,
   CardContent,
   CardActions,
   Grid,
   Box,
+  Typography,
   Paper,
-  IconButton,
   useTheme,
 } from "@mui/material";
 import {
   Bookmark as BookmarkIcon,
-  ExitToApp as ExitToAppIcon,
-  Settings as SettingsIcon,
   MenuBook as MenuBookIcon,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import defaultAvatar from "../img/deficon.png";
+import Layout from "../components/Layout"; // へっだー
 
 // ホームページ
 const HomePage = () => {
-  const { user, setUser } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const theme = useTheme();
 
-  const handleLogout = async () => {
-    await logout();
-    setUser(null);
-    navigate("/login");
-  };
-
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "grey.100" }}>
-      <AppBar position="static" elevation={0}>
-        <Toolbar>
-          <BookmarkIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
-            ReadNext
-          </Typography>
-          {user ? (
-            <IconButton color="inherit" onClick={handleLogout}>
-              <ExitToAppIcon />
-            </IconButton>
-          ) : (
-            <Button
-              component={Link}
-              to="/login"
-              color="inherit"
-              startIcon={<ExitToAppIcon />}
-            >
-              ログイン
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
-
+    <Layout>
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -175,7 +140,7 @@ const HomePage = () => {
           </Grid>
         </Grid>
       </Container>
-    </Box>
+    </Layout>
   );
 };
 

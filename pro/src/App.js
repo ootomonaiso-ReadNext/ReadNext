@@ -1,26 +1,29 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom'; 
-import { AuthProvider } from './context/AuthContext';
-import HomePage from './pages/HomePage';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import UserSetting from './pages/UserSetting';
-import UserBookshelfPage from './pages/UserBookshelfPage';
-import AddBookFromDatabasePage from './pages/AddBookFromDatabasePage';
-import BookSearchPage from './pages/BookSearchPage'; 
-import ThreadListPage from './pages/ThreadListPage';
+import React from "react";
+import { Routes, Route } from "react-router-dom"; 
+import { AuthProvider } from "./context/AuthContext";
+import HomePage from "./pages/HomePage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import UserSetting from "./pages/UserSetting";
+import UserBookshelfPage from "./pages/UserBookshelfPage";
+import AddBookFromDatabasePage from "./pages/AddBookFromDatabasePage";
+import BookSearchPage from "./pages/BookSearchPage"; 
+import ThreadListPage from "./pages/ThreadListPage";
 import NewThreadPage from "./pages/NewThreadPage";
 import ThreadPage from "./pages/ThreadPage"; 
 import UserMake from "./pages/UserMake"; 
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* ログイン関連 */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/usermake" element={<UserMake />} />
+
+        {/* ログイン後表示できるよゾーン */}
         <Route
           path="/"
           element={
