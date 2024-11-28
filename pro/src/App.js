@@ -11,6 +11,7 @@ import BookSearchPage from './pages/BookSearchPage';
 import ThreadListPage from './pages/ThreadListPage';
 import NewThreadPage from "./pages/NewThreadPage";
 import ThreadPage from "./pages/ThreadPage"; 
+import UserMake from "./pages/UserMake"; 
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
