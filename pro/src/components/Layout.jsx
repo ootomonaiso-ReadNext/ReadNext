@@ -6,7 +6,7 @@ import {
   Box,
   Drawer,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   BottomNavigation,
@@ -44,7 +44,6 @@ const Layout = ({ children }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              bgcolor: "grey.100", // 背景色（必要に応じて変更）
               px: 2,
             }}
           >
@@ -95,7 +94,6 @@ const Layout = ({ children }) => {
               "& .MuiDrawer-paper": {
                 width: 240,
                 boxSizing: "border-box",
-                bgcolor: "white",
               },
             }}
           >
@@ -107,31 +105,31 @@ const Layout = ({ children }) => {
               ReadNext
             </Typography>
             <List>
-              <ListItem button component={Link} to="/">
+              <ListItemButton component={Link} to="/">
                 <ListItemIcon>
                   <HomeIcon />
                 </ListItemIcon>
                 <ListItemText primary="ホーム" />
-              </ListItem>
-              <ListItem button component={Link} to="/bookshelf">
+              </ListItemButton>
+              <ListItemButton component={Link} to="/bookshelf">
                 <ListItemIcon>
                   <BookshelfIcon />
                 </ListItemIcon>
                 <ListItemText primary="本棚" />
-              </ListItem>
-              <ListItem button component={Link} to="/book-search">
+              </ListItemButton>
+              <ListItemButton component={Link} to="/book-search">
                 <ListItemIcon>
                   <SearchIcon />
                 </ListItemIcon>
                 <ListItemText primary="検索" />
-              </ListItem>
+              </ListItemButton>
               {user && (
-                <ListItem button onClick={handleLogout}>
+                <ListItemButton onClick={handleLogout}>
                   <ListItemIcon>
                     <ExitToAppIcon />
                   </ListItemIcon>
                   <ListItemText primary="ログアウト" />
-                </ListItem>
+                </ListItemButton>
               )}
             </List>
           </Drawer>
@@ -139,7 +137,7 @@ const Layout = ({ children }) => {
             component="main"
             sx={{
               flex: 1,
-              bgcolor: "grey.100", // 背景色（統一）
+              bgcolor: "grey.100",
               p: 3,
             }}
           >
