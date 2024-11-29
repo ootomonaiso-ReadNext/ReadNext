@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { logout } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import {
+  AppBar,
+  Toolbar,
+  IconButton,
   Box,
   Drawer,
   List,
@@ -19,12 +22,14 @@ import {
   LibraryBooks as BookshelfIcon,
   Search as SearchIcon,
   ExitToApp as ExitToAppIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 
 const Layout = ({ children }) => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   const handleLogout = async () => {
     await logout();
@@ -32,19 +37,45 @@ const Layout = ({ children }) => {
     navigate("/login");
   };
 
+  const toggleDrawer = () => {
+    setDrawerOpen((prev) => !prev);
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      {/* ヘッダー */}
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
+        <Toolbar>
+          {!isMobile && (
+            <IconButton
+              color="inherit"
+              edge="start"
+              onClick={toggleDrawer}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            ReadNext
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
       {isMobile ? (
         // スマホ版
         <>
           <Box
             component="main"
             sx={{
-              flex: 1,
+              flex: 2,
               display: "flex",
               justifyContent: "center",
-              alignItems: "center",
               px: 2,
+              mt: 8, // ヘッダーの高さ分の余白
             }}
           >
             {children || (
@@ -84,26 +115,22 @@ const Layout = ({ children }) => {
         </>
       ) : (
         // PC版
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", mt: 8 /* ヘッダーの高さ分調整 */ }}>
           <Drawer
-            variant="permanent"
+            variant="persistent"
+            open={drawerOpen}
             anchor="left"
             sx={{
-              width: 240,
+              width: drawerOpen ? 240 : 0,
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: 240,
+                width: drawerOpen ? 240 : 0,
                 boxSizing: "border-box",
+                transition: "width 0.3s",
+                marginTop: "64px", // ヘッダーの高さ分下げる
               },
             }}
           >
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ textAlign: "center", py: 2, fontWeight: "bold" }}
-            >
-              ReadNext
-            </Typography>
             <List>
               <ListItemButton component={Link} to="/">
                 <ListItemIcon>
@@ -123,26 +150,35 @@ const Layout = ({ children }) => {
                 </ListItemIcon>
                 <ListItemText primary="検索" />
               </ListItemButton>
-              {user && (
+            </List>
+            {user && (
+              <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
                 <ListItemButton onClick={handleLogout}>
                   <ListItemIcon>
                     <ExitToAppIcon />
                   </ListItemIcon>
                   <ListItemText primary="ログアウト" />
                 </ListItemButton>
-              )}
-            </List>
+              </Box>
+            )}
           </Drawer>
+
           <Box
             component="main"
             sx={{
               flex: 1,
               p: 3,
+              transition: "left 0.3s, padding 0.3s",
+              marginLeft: drawerOpen ? "240px" : "0px", // サイドバーが開いている場合は左揃え
+              display: "block", // メインコンテンツを左揃え
+              width: "100%", // 幅を100%に設定
+              maxWidth: drawerOpen ? "100%" : "960px", // サイドバーが閉じているときのみ制限
+              boxSizing: "border-box", // 余計なスペースをなくす
             }}
           >
-            {children || (
-              <Typography>PC版: コンテンツがありません。</Typography>
-            )}
+            <Box sx={{ width: "100%" }}>
+              {children || <Typography>PC版: コンテンツがありません。</Typography>}
+            </Box>
           </Box>
         </Box>
       )}
