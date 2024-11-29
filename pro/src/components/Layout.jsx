@@ -137,7 +137,6 @@ const Layout = ({ children }) => {
             component="main"
             sx={{
               flex: 1,
-              bgcolor: "grey.100",
               p: 3,
             }}
           >
