@@ -6,42 +6,54 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isEmailVerified } = useAuth(); // AuthContext から isEmailVerified を取得
   const [hasServiceAccount, setHasServiceAccount] = useState(null);
+  const [loading, setLoading] = useState(true); // ローディング状態を追加
 
   useEffect(() => {
     const checkServiceAccount = async () => {
       if (user) {
-        const serviceAccountRef = doc(db, 'users', user.uid); // 'users' コレクションに変更
-        const docSnap = await getDoc(serviceAccountRef);
+        try {
+          const serviceAccountRef = doc(db, 'users', user.uid); // 'users' コレクションを参照
+          const docSnap = await getDoc(serviceAccountRef);
 
-        if (docSnap.exists()) {
-          setHasServiceAccount(true);
-        } else {
+          if (docSnap.exists()) {
+            setHasServiceAccount(true);
+          } else {
+            setHasServiceAccount(false);
+          }
+        } catch (error) {
+          console.error("Firestore のユーザードキュメント取得中にエラーが発生しました:", error);
           setHasServiceAccount(false);
         }
       }
+      setLoading(false); // チェック完了後にローディングを終了
     };
 
     checkServiceAccount();
   }, [user]);
 
-  // ログインしていない場合はログインページへリダイレクト
+  // ローディング中はローディング表示
+  if (loading) {
+    return <p>読み込み中...</p>; // 日本語で「読み込み中...」と表示
+  }
+
+  // ユーザーが認証されていない場合はログインページへリダイレクト
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // サービスアカウントがない場合は、アカウント作成ページへリダイレクト
+  // メールアドレスが未検証の場合はメール検証ページへリダイレクト
+  if (!isEmailVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
+  // サービスアカウントが存在しない場合はアカウント作成ページへリダイレクト
   if (hasServiceAccount === false) {
     return <Navigate to="/usermake" replace />;
   }
 
-  // サービスアカウントが存在するか確認中はローディング表示
-  if (hasServiceAccount === null) {
-    return <p>なうろうでんぐ</p>;
-  }
-
-  // サービスアカウントが存在する場合のみ子コンポーネントを表示
+  // すべての条件を満たしている場合は子コンポーネントを表示
   return children;
 };
 
