@@ -169,7 +169,6 @@ const Layout = ({ children }) => {
               flex: 1,
               p: 3,
               transition: "left 0.3s, padding 0.3s",
-              marginLeft: drawerOpen ? "240px" : "0px", // サイドバーが開いている場合は左揃え
               display: "block", // メインコンテンツを左揃え
               width: "100%", // 幅を100%に設定
               maxWidth: drawerOpen ? "100%" : "960px", // サイドバーが閉じているときのみ制限
