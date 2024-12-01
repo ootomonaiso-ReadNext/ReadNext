@@ -46,7 +46,9 @@ const Layout = ({ children }) => {
       {/* ヘッダー */}
       <AppBar
         position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
       >
         <Toolbar>
           {!isMobile && (
@@ -71,7 +73,7 @@ const Layout = ({ children }) => {
           <Box
             component="main"
             sx={{
-              flex: 2,
+              flex: 1,
               display: "flex",
               justifyContent: "center",
               px: 2,
@@ -115,19 +117,21 @@ const Layout = ({ children }) => {
         </>
       ) : (
         // PC版
-        <Box sx={{ display: "flex", mt: 8 /* ヘッダーの高さ分調整 */ }}>
+        <Box sx={{ display: "flex" }}>
           <Drawer
             variant="persistent"
             open={drawerOpen}
             anchor="left"
             sx={{
-              width: drawerOpen ? 240 : 0,
-              flexShrink: 0,
               "& .MuiDrawer-paper": {
                 width: drawerOpen ? 240 : 0,
                 boxSizing: "border-box",
-                transition: "width 0.3s",
-                marginTop: "64px", // ヘッダーの高さ分下げる
+                marginTop: "64px", // ヘッダーの高さ分
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "calc(100vh - 64px)", // ヘッダーの高さを引いた高さ
+                overflow: "hidden",
               },
             }}
           >
@@ -152,7 +156,7 @@ const Layout = ({ children }) => {
               </ListItemButton>
             </List>
             {user && (
-              <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
+              <Box sx={{ mt: "auto", px: 2, pb: 2 }}>
                 <ListItemButton onClick={handleLogout}>
                   <ListItemIcon>
                     <ExitToAppIcon />
@@ -168,16 +172,12 @@ const Layout = ({ children }) => {
             sx={{
               flex: 1,
               p: 3,
-              transition: "left 0.3s, padding 0.3s",
-              display: "block", // メインコンテンツを左揃え
-              width: "100%", // 幅を100%に設定
-              maxWidth: drawerOpen ? "100%" : "960px", // サイドバーが閉じているときのみ制限
-              boxSizing: "border-box", // 余計なスペースをなくす
+              marginLeft: drawerOpen ? "240px" : "0",
+              marginTop: "64px", // ヘッダーの高さ分
+              transition: "margin-left 0.3s",
             }}
           >
-            <Box sx={{ width: "100%" }}>
-              {children || <Typography>PC版: コンテンツがありません。</Typography>}
-            </Box>
+            {children || <Typography>PC版: コンテンツがありません。</Typography>}
           </Box>
         </Box>
       )}
