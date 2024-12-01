@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { logout } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import {
+  AppBar,
+  Toolbar,
+  IconButton,
   Box,
   Drawer,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   BottomNavigation,
@@ -19,12 +22,14 @@ import {
   LibraryBooks as BookshelfIcon,
   Search as SearchIcon,
   ExitToApp as ExitToAppIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 
 const Layout = ({ children }) => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   const handleLogout = async () => {
     await logout();
@@ -32,8 +37,36 @@ const Layout = ({ children }) => {
     navigate("/login");
   };
 
+  const toggleDrawer = () => {
+    setDrawerOpen((prev) => !prev);
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      {/* ヘッダー */}
+      <AppBar
+        position="fixed"
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
+        <Toolbar>
+          {!isMobile && (
+            <IconButton
+              color="inherit"
+              edge="start"
+              onClick={toggleDrawer}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            ReadNext
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
       {isMobile ? (
         // スマホ版
         <>
@@ -43,9 +76,8 @@ const Layout = ({ children }) => {
               flex: 1,
               display: "flex",
               justifyContent: "center",
-              alignItems: "center",
-              bgcolor: "grey.100", // 背景色（必要に応じて変更）
               px: 2,
+              mt: 8, // ヘッダーの高さ分の余白
             }}
           >
             {children || (
@@ -87,65 +119,65 @@ const Layout = ({ children }) => {
         // PC版
         <Box sx={{ display: "flex" }}>
           <Drawer
-            variant="permanent"
+            variant="persistent"
+            open={drawerOpen}
             anchor="left"
             sx={{
-              width: 240,
-              flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: 240,
+                width: drawerOpen ? 240 : 0,
                 boxSizing: "border-box",
-                bgcolor: "white",
+                marginTop: "64px", // ヘッダーの高さ分
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "calc(100vh - 64px)", // ヘッダーの高さを引いた高さ
+                overflow: "hidden",
               },
             }}
           >
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ textAlign: "center", py: 2, fontWeight: "bold" }}
-            >
-              ReadNext
-            </Typography>
             <List>
-              <ListItem button component={Link} to="/">
+              <ListItemButton component={Link} to="/">
                 <ListItemIcon>
                   <HomeIcon />
                 </ListItemIcon>
                 <ListItemText primary="ホーム" />
-              </ListItem>
-              <ListItem button component={Link} to="/bookshelf">
+              </ListItemButton>
+              <ListItemButton component={Link} to="/bookshelf">
                 <ListItemIcon>
                   <BookshelfIcon />
                 </ListItemIcon>
                 <ListItemText primary="本棚" />
-              </ListItem>
-              <ListItem button component={Link} to="/book-search">
+              </ListItemButton>
+              <ListItemButton component={Link} to="/book-search">
                 <ListItemIcon>
                   <SearchIcon />
                 </ListItemIcon>
                 <ListItemText primary="検索" />
-              </ListItem>
-              {user && (
-                <ListItem button onClick={handleLogout}>
+              </ListItemButton>
+            </List>
+            {user && (
+              <Box sx={{ mt: "auto", px: 2, pb: 2 }}>
+                <ListItemButton onClick={handleLogout}>
                   <ListItemIcon>
                     <ExitToAppIcon />
                   </ListItemIcon>
                   <ListItemText primary="ログアウト" />
-                </ListItem>
-              )}
-            </List>
+                </ListItemButton>
+              </Box>
+            )}
           </Drawer>
+
           <Box
             component="main"
             sx={{
               flex: 1,
-              bgcolor: "grey.100", // 背景色（統一）
               p: 3,
+              marginLeft: drawerOpen ? "240px" : "0",
+              marginTop: "64px", // ヘッダーの高さ分
+              transition: "margin-left 0.3s",
             }}
           >
-            {children || (
-              <Typography>PC版: コンテンツがありません。</Typography>
-            )}
+            {children || <Typography>PC版: コンテンツがありません。</Typography>}
           </Box>
         </Box>
       )}
