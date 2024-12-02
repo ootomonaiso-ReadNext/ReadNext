@@ -19,7 +19,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import { Add as AddIcon, Book as BookIcon } from "@mui/icons-material";
-import Layout from "../components/Layout"; // Layoutをインポート
+import Layout from "../components/Layout"; 
 
 // ユーザーの蔵書一覧を表示するページ
 const UserBookshelfPage = () => {

@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Link } from "react-router-dom";
 import { Box, Container, TextField, Typography, List, ListItem, ListItemText } from "@mui/material";
-import Layout from "../components/Layout"; // Layoutをインポート
+import Layout from "../components/Layout"; 
 
 // 本を検索するページ
 const BookSearchPage = () => {
@@ -11,7 +11,7 @@ const BookSearchPage = () => {
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
 
-  // 初回に蔵書データをFirestoreから取得
+  // 初回蔵書データ取得
   useEffect(() => {
     const fetchBooks = async () => {
       const booksRef = collection(db, "books");
@@ -32,7 +32,7 @@ const BookSearchPage = () => {
       );
       setFilteredBooks(filtered);
     } else {
-      setFilteredBooks(books); // 検索文字がない場合は全蔵書
+      setFilteredBooks(books); // 検索文字がない場合は全蔵書表示
     }
   }, [searchTerm, books]);
 

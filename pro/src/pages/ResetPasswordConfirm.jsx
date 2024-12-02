@@ -27,7 +27,7 @@ const ResetPasswordConfirm = () => {
       await confirmPasswordReset(auth, oobCode, newPassword);
       setMessage("パスワードが正常にリセットされました。ログインしてください。");
       setTimeout(() => {
-        navigate("/login"); // ログインページにリダイレクト
+        navigate("/login");
       }, 3000);
     } catch (err) {
       setError("パスワードのリセットに失敗しました。リンクが有効であることを確認してください。");

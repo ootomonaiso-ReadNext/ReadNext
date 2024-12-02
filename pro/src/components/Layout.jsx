@@ -77,7 +77,7 @@ const Layout = ({ children }) => {
               display: "flex",
               justifyContent: "center",
               px: 2,
-              mt: 8, // ヘッダーの高さ分の余白
+              mt: 8, 
             }}
           >
             {children || (

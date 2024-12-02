@@ -8,8 +8,8 @@ import { Container, TextField, Button, Typography, Box, Alert } from "@mui/mater
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userId, setUserId] = useState(""); // ユーザーID用のフィールド
-  const [userName, setUserName] = useState(""); // ユーザーネーム用のフィールド
+  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState(""); 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null); // 成功メッセージ用
   const { setUser } = useAuth();
