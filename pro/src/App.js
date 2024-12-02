@@ -1,5 +1,6 @@
+// src/App.js
 import React from "react";
-import { Routes, Route } from "react-router-dom"; 
+import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
@@ -7,23 +8,29 @@ import Register from "./pages/Register";
 import UserSetting from "./pages/UserSetting";
 import UserBookshelfPage from "./pages/UserBookshelfPage";
 import AddBookFromDatabasePage from "./pages/AddBookFromDatabasePage";
-import BookSearchPage from "./pages/BookSearchPage"; 
+import BookSearchPage from "./pages/BookSearchPage";
 import ThreadListPage from "./pages/ThreadListPage";
 import NewThreadPage from "./pages/NewThreadPage";
-import ThreadPage from "./pages/ThreadPage"; 
-import UserMake from "./pages/UserMake"; 
+import ThreadPage from "./pages/ThreadPage";
+import UserMake from "./pages/UserMake";
+import PasswordReset from "./pages/PasswordReset";
+import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
+import VerifyEmail from "./pages/VerifyEmail";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* ログイン関連 */}
+        {/* 公開ルート（認証不要） */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/usermake" element={<UserMake />} />
+        <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/reset-password" element={<ResetPasswordConfirm />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* ログイン後表示できるよゾーン */}
+        {/* 保護されたルート（認証が必要） */}
         <Route
           path="/"
           element={
@@ -96,9 +103,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* 404ページ */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
   );
 }
+
+// 404ページコンポーネント
+const NotFound = () => {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h1>404 - ページが見つかりません</h1>
+      <p>申し訳ありませんが、お探しのページは存在しません。</p>
+    </div>
+  );
+};
 
 export default App;

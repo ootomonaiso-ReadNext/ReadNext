@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { signUpWithEmail } from "../services/authService";
+import { signUpWithEmail, sendVerificationEmail } from "../services/authService";
 import { createUserDocument } from "../services/userService";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
 
 // 新規アカウント登録ページ
@@ -12,29 +11,36 @@ const Register = () => {
   const [userId, setUserId] = useState(""); // ユーザーID用のフィールド
   const [userName, setUserName] = useState(""); // ユーザーネーム用のフィールド
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null); // 成功メッセージ用
   const { setUser } = useAuth();
-  const navigate = useNavigate();
 
   const handleSignUp = async () => {
     setError(null); // エラーを初期化
+    setSuccess(null); // 成功メッセージを初期化
 
     // 必須フィールドのチェック
     if (!userId.trim() || !userName.trim()) {
       setError("ユーザーIDとユーザーネームを入力してください");
       return;
     }
-    
+
     try {
       // Firebase Authでアカウントを作成
       const userCredential = await signUpWithEmail(email, password);
       setUser(userCredential.user);
 
+      // メール検証を送信
+      await sendVerificationEmail(userCredential.user);
+
       // Firestoreにユーザー情報を保存
       const settings = { theme: "light", notifications: true };
       await createUserDocument(userCredential.user.uid, userId, userName, settings);
 
-      // ホームページにリダイレクト
-      navigate("/");
+      // 成功メッセージを表示
+      setSuccess("登録が完了しました。メールを確認してアカウントを有効化してください。");
+
+      // 必要に応じてリダイレクト（メール検証後にログインさせる場合はコメントアウト）
+      // navigate("/");
     } catch (error) {
       setError(error.message); // エラーメッセージをセット
     }
@@ -57,6 +63,7 @@ const Register = () => {
           新規アカウント登録
         </Typography>
         {error && <Alert severity="error" sx={{ width: "100%", mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ width: "100%", mb: 2 }}>{success}</Alert>}
         <TextField
           label="Eメール"
           variant="outlined"
