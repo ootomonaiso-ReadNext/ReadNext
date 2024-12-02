@@ -1,14 +1,12 @@
-// src/pages/UserSetting.js
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { updateProfile, updatePassword } from "firebase/auth";
-import { db } from "../firebaseConfig"; // Firestoreの初期化ファイルをインポート
-import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore操作のための関数をインポート
+import { db } from "../firebaseConfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { TextField, Button, Container, Typography, Box, Alert, Link as MUILink } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom"; // 追加
-import Layout from "../components/Layout"; // これはヘッダー
+import { Link as RouterLink } from "react-router-dom";
+import Layout from "../components/Layout";
 
-// ユーザー設定ページ
 const UserSetting = () => {
   const { user, setUser } = useAuth();
   const [username, setUsername] = useState("");
@@ -50,13 +48,13 @@ const UserSetting = () => {
       const userDocRef = doc(db, "users", user.uid);
       await updateDoc(userDocRef, { userName: username });
 
-      // ユーザーオブジェクトの displayName を更新（メソッドを保持するためにスプレッドしない）
+      // ユーザーオブジェクトの displayName を更新
       setUser({ ...user, displayName: username });
 
       setMessage("ユーザーネームの更新成功!");
     } catch (error) {
-      setMessage("なんか更新失敗しちゃった...");
-      console.error("えらー!そのユーザーネームのここがおかしい:", error);
+      setMessage("ユーザーネームの更新に失敗しました。");
+      console.error("エラー:", error);
     }
   };
 
@@ -79,7 +77,7 @@ const UserSetting = () => {
       setConfirmPassword("");
     } catch (error) {
       setPasswordMessage("パスワードの更新に失敗しました。");
-      console.error("えらー!パスワードのここがおかしい:", error);
+      console.error("エラー:", error);
     }
   };
 
@@ -88,11 +86,11 @@ const UserSetting = () => {
       <Container maxWidth="sm" sx={{ mt: 4 }}>
         <Box sx={{ p: 3, boxShadow: 2, borderRadius: 2, textAlign: "center" }}>
           <Typography variant="h5" gutterBottom>
-            ゆーざーせってぃんぐ
+            ユーザー設定
           </Typography>
           {/* ユーザーネーム変更 */}
           <TextField
-            label="Username"
+            label="ユーザーネーム"
             value={username}
             onChange={handleUsernameChange}
             variant="outlined"
@@ -114,13 +112,50 @@ const UserSetting = () => {
             </Alert>
           )}
 
+          {/* パスワード変更 */}
+          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+            パスワード変更
+          </Typography>
+          <TextField
+            label="新しいパスワード"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="新しいパスワード（確認）"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handlePasswordReset}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            パスワードを更新
+          </Button>
+          {passwordMessage && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              {passwordMessage}
+            </Alert>
+          )}
+
           {/* パスワードリセットページへのリンク */}
           <Box sx={{ mt: 4 }}>
             <Typography variant="body2">
-              パスワードをリセットしたい場合は、{' '}
+              パスワードをリセットしたい場合は、{" "}
               <MUILink component={RouterLink} to="/password-reset">
                 こちら
-              </MUILink>
+              </MUILink>{" "}
               からリセットしてください。
             </Typography>
           </Box>
