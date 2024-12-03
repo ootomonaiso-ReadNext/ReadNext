@@ -1,37 +1,29 @@
 import React, { useState } from "react";
 import { auth } from "../firebaseConfig";
-import { confirmPasswordReset } from "firebase/auth";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
 import Layout from "../components/Layout";
 
-const ResetPasswordConfirm = () => {
-  const [searchParams] = useSearchParams();
-  const oobCode = searchParams.get("oobCode");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+const ResetPasswordRequest = () => {
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
-  const handleResetPassword = async () => {
+  const handleSendResetEmail = async () => {
     setMessage("");
     setError("");
 
-    if (newPassword !== confirmPassword) {
-      setError("パスワードが一致しません。");
+    if (!email) {
+      setError("メールアドレスを入力してください。");
       return;
     }
 
     try {
-      await confirmPasswordReset(auth, oobCode, newPassword);
-      setMessage("パスワードが正常にリセットされました。ログインしてください。");
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
+      await sendPasswordResetEmail(auth, email);
+      setMessage("パスワードリセットメールを送信しました。メールを確認してください。");
     } catch (err) {
-      setError("パスワードのリセットに失敗しました。リンクが有効であることを確認してください。");
-      console.error("パスワードリセット確認エラー:", err);
+      setError("メール送信に失敗しました。正しいメールアドレスを入力してください。");
+      console.error("パスワードリセットメール送信エラー:", err);
     }
   };
 
@@ -40,22 +32,13 @@ const ResetPasswordConfirm = () => {
       <Container maxWidth="sm" sx={{ mt: 4 }}>
         <Box sx={{ p: 3, boxShadow: 2, borderRadius: 2, textAlign: "center" }}>
           <Typography variant="h5" gutterBottom>
-            新しいパスワードの設定
+            パスワードリセットメール送信
           </Typography>
           <TextField
-            label="新しいパスワード"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="新しいパスワードの確認"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            label="登録済みのメールアドレス"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -63,11 +46,11 @@ const ResetPasswordConfirm = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleResetPassword}
+            onClick={handleSendResetEmail}
             fullWidth
             sx={{ mt: 2 }}
           >
-            パスワードをリセット
+            リセットメールを送信
           </Button>
           {message && (
             <Alert severity="success" sx={{ mt: 2 }}>
@@ -85,4 +68,4 @@ const ResetPasswordConfirm = () => {
   );
 };
 
-export default ResetPasswordConfirm;
+export default ResetPasswordRequest;
