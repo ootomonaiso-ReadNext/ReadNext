@@ -52,13 +52,13 @@ const Register = () => {
       // メール認証を送信
       await sendVerificationEmail(user);
 
-      setSuccess("登録が完了しました。確認メールを送信しました。メールを確認してください。");
+      setSuccess("確認メールを送信しました。メールを確認してください。メールアドレス検証に成功しているとこのサービスで使用するアカウントの作成画面へ遷移します。");
 
-      // ポーリングでメール確認をチェック
+      // メール確認をチェック
       const interval = setInterval(async () => {
         await user.reload(); // Firebase でユーザー情報を更新
         if (user.emailVerified) {
-          clearInterval(interval); // ポーリングを停止
+          clearInterval(interval); 
           console.log("メール確認が完了しました。");
 
           // メール確認後、自動的にログインしトップページにリダイレクト
