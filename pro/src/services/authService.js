@@ -19,8 +19,12 @@ export const loginWithEmail = async (email, password) => {
 
 // Googleログイン
 export const loginWithGoogle = async () => {
+  googleProvider.setCustomParameters({
+    prompt: "select_account", 
+  });
   return await signInWithPopup(auth, googleProvider);
 };
+
 
 // ログアウト
 export const logout = async () => {
