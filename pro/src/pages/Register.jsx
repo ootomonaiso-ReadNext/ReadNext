@@ -1,48 +1,76 @@
 import React, { useState } from "react";
-import { signUpWithEmail, sendVerificationEmail } from "../services/authService";
-import { createUserDocument } from "../services/userService";
-import { useAuth } from "../context/AuthContext";
-import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
+import { signUpWithEmail, sendVerificationEmail, loginWithEmail } from "../services/authService";
+import { useNavigate } from "react-router-dom"; // リダイレクト用
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+} from "@mui/material";
 
-// 新規アカウント登録ページ
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userId, setUserId] = useState("");
-  const [userName, setUserName] = useState(""); 
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null); // 成功メッセージ用
-  const { setUser } = useAuth();
+  const [success, setSuccess] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // リダイレクト用
 
   const handleSignUp = async () => {
-    setError(null); // エラーを初期化
-    setSuccess(null); // 成功メッセージを初期化
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
 
-    // 必須フィールドのチェック
-    if (!userId.trim() || !userName.trim()) {
-      setError("ユーザーIDとユーザーネームを入力してください");
+    // 入力チェック
+    if (!email || !password) {
+      setError("メールアドレスとパスワードを入力してください。");
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("正しいメールアドレスを入力してください。");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("パスワードは6文字以上である必要があります。");
+      setLoading(false);
       return;
     }
 
     try {
-      // Firebase Authでアカウントを作成
+      // ユーザー登録
       const userCredential = await signUpWithEmail(email, password);
-      setUser(userCredential.user);
+      const user = userCredential.user;
+      console.log("新規ユーザー:", user);
 
-      // メール検証を送信
-      await sendVerificationEmail(userCredential.user);
+      // メール認証を送信
+      await sendVerificationEmail(user);
 
-      // Firestoreにユーザー情報を保存
-      const settings = { theme: "light", notifications: true };
-      await createUserDocument(userCredential.user.uid, userId, userName, settings);
+      setSuccess("確認メールを送信しました。メールを確認してください。メールアドレス検証に成功しているとこのサービスで使用するアカウントの作成画面へ遷移します。");
 
-      // 成功メッセージを表示
-      setSuccess("登録が完了しました。メールを確認してアカウントを有効化してください。");
+      // メール確認をチェック
+      const interval = setInterval(async () => {
+        await user.reload(); // Firebase でユーザー情報を更新
+        if (user.emailVerified) {
+          clearInterval(interval); 
+          console.log("メール確認が完了しました。");
 
-      // 必要に応じてリダイレクト（メール検証後にログインさせる場合はコメントアウト）
-      // navigate("/");
+          // メール確認後、自動的にログインしトップページにリダイレクト
+          await loginWithEmail(email, password); // 再ログイン
+          navigate("/"); // トップページへリダイレクト
+        }
+      }, 3000); // 3秒ごとに確認
     } catch (error) {
-      setError(error.message); // エラーメッセージをセット
+      console.error("登録エラー:", error.message);
+      setError("登録に失敗しました: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,30 +109,15 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <TextField
-          label="ユーザーID"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-        />
-        <TextField
-          label="ユーザーネーム"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-        />
         <Button
           variant="contained"
           color="primary"
           fullWidth
           sx={{ mt: 2 }}
           onClick={handleSignUp}
+          disabled={loading}
         >
-          サインアップ
+          {loading ? "登録中..." : "サインアップ"}
         </Button>
       </Box>
     </Container>
