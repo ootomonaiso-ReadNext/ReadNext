@@ -20,17 +20,20 @@ import {
   Settings as SettingsIcon,
 } from "@mui/icons-material";
 import defaultAvatar from "../img/deficon.png";
-import Layout from "../components/Layout"; // へっだー
+import Layout from "../components/Layout";
 
-// ホームページ maxWidth="md" sx={{ mt: 4, mb: 4 }}
 const HomePage = () => {
   const { user } = useAuth();
   const theme = useTheme();
+
+  // デバッグ用: 現在のテーマの内容を確認
+  console.log("現在のテーマ:", theme.palette);
 
   return (
     <Layout>
       <Container>
         <Grid container spacing={3}>
+          {/* ユーザー情報 */}
           <Grid item xs={12}>
             <Paper
               elevation={3}
@@ -38,7 +41,9 @@ const HomePage = () => {
                 p: 3,
                 display: "flex",
                 alignItems: "center",
-                background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${
+                  theme.palette.primary.light || theme.palette.primary.main
+                } 90%)`,
                 color: "white",
               }}
             >
@@ -70,12 +75,14 @@ const HomePage = () => {
             </Paper>
           </Grid>
 
+          {/* 本棚へのリンク */}
           <Grid item xs={12}>
             <Card
               elevation={3}
               sx={{
                 position: "relative",
                 overflow: "visible",
+                backgroundColor: theme.palette.background.paper,
                 "&:hover": {
                   transform: "translateY(-4px)",
                   transition: "transform 0.3s ease-in-out",
@@ -97,7 +104,7 @@ const HomePage = () => {
                 </Box>
                 <Typography
                   variant="body1"
-                  sx={{ fontSize: "1.1rem", color: "text.secondary" }}
+                  sx={{ fontSize: "1.1rem", color: theme.palette.text.primary }}
                 >
                   あなたの蔵書を一覧表示し、編集や追加ができます。やったね！
                 </Typography>
