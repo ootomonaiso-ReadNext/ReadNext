@@ -17,7 +17,7 @@ import {
   Fab,
 } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import Layout from "../components/Layout"; // Layoutを使用
+import Layout from "../components/Layout"; 
 
 const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes?q=";
 const RESULTS_PER_PAGE = 40;

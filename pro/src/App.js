@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -13,8 +12,7 @@ import ThreadListPage from "./pages/ThreadListPage";
 import NewThreadPage from "./pages/NewThreadPage";
 import ThreadPage from "./pages/ThreadPage";
 import UserMake from "./pages/UserMake";
-import PasswordReset from "./pages/PasswordReset";
-import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
+import PasswordReset from "./pages/PasswordReset"; 
 import VerifyEmail from "./pages/VerifyEmail";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -27,7 +25,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/usermake" element={<UserMake />} />
         <Route path="/password-reset" element={<PasswordReset />} />
-        <Route path="/reset-password" element={<ResetPasswordConfirm />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* 保護されたルート（認証が必要） */}

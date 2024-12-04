@@ -13,8 +13,8 @@ const ThreadPage = () => {
   const [thread, setThread] = useState(null); 
   const [comments, setComments] = useState([]); 
   const [newComment, setNewComment] = useState("");
-  const [replyTo, setReplyTo] = useState(null); // 返信先コメントのID
-  const [quote, setQuote] = useState(null); // 安価として引用するコメント内容
+  const [replyTo, setReplyTo] = useState(null); 
+  const [quote, setQuote] = useState(null); 
 
   // コメント一覧を取得
   const fetchComments = useCallback(async () => {

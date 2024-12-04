@@ -133,7 +133,7 @@ const HomePage = () => {
                     mt: 2,
                   }}
                 >
-                  本を検索
+                  登録されている本を見る
                 </Button>
               </CardActions>
             </Card>

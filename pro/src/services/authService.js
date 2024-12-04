@@ -19,8 +19,12 @@ export const loginWithEmail = async (email, password) => {
 
 // Googleログイン
 export const loginWithGoogle = async () => {
+  googleProvider.setCustomParameters({
+    prompt: "select_account", 
+  });
   return await signInWithPopup(auth, googleProvider);
 };
+
 
 // ログアウト
 export const logout = async () => {
@@ -30,5 +34,5 @@ export const logout = async () => {
 // メール認証を送信
 export const sendVerificationEmail = async (user) => {
   if (!user) throw new Error("ユーザー情報が見つかりません。");
-  await sendEmailVerification(user); // Firebaseの関数を利用
+  await sendEmailVerification(user); 
 };

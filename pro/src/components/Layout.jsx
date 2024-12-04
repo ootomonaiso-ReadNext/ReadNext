@@ -68,7 +68,7 @@ const Layout = ({ children }) => {
       </AppBar>
 
       {isMobile ? (
-        // スマホ版
+        // スマホ用
         <>
           <Box
             component="main"
@@ -77,11 +77,11 @@ const Layout = ({ children }) => {
               display: "flex",
               justifyContent: "center",
               px: 2,
-              mt: 8, // ヘッダーの高さ分の余白
+              mt: 8, 
             }}
           >
             {children || (
-              <Typography>スマホ版: コンテンツがありません。</Typography>
+              <Typography>どうやってここまで?</Typography>
             )}
           </Box>
           <BottomNavigation
@@ -116,7 +116,7 @@ const Layout = ({ children }) => {
           </BottomNavigation>
         </>
       ) : (
-        // PC版
+        // PC版 サイドバー宣言もここにあるよ
         <Box sx={{ display: "flex" }}>
           <Drawer
             variant="persistent"
@@ -130,7 +130,7 @@ const Layout = ({ children }) => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                height: "calc(100vh - 64px)", // ヘッダーの高さを引いた高さ
+                height: "calc(100vh - 64px)", // ヘッダーの高さを引いた高さにしないと食い込むぞ
                 overflow: "hidden",
               },
             }}
