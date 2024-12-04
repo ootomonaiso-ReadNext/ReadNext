@@ -54,7 +54,7 @@ const BookSearchPage = () => {
 
         <List>
           {filteredBooks.map((book) => (
-            <ListItem key={book.id} component={Link} to={`/books/${book.id}/threads`} button>
+            <ListItem key={book.id} component={Link} to={`/books/${book.id}/threads`}>
               <ListItemText primary={book.title} secondary={book.authors} />
             </ListItem>
           ))}
