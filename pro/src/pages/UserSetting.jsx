@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
+import { ColorPicker } from "@mui/lab";
 import Layout from "../components/Layout";
 import { useThemeContext } from "../context/ThemeContext";
 
@@ -36,9 +37,6 @@ const UserSetting = () => {
       }
     }
   }, [userData, setThemeId]);
-
-  const handlePrimaryColorChange = (e) => setPrimaryColor(e.target.value);
-  const handleSecondaryColorChange = (e) => setSecondaryColor(e.target.value);
 
   const handleSaveUsername = async () => {
     if (!auth.currentUser) {
@@ -131,17 +129,25 @@ const UserSetting = () => {
           {themeId === "custom" && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">カスタムテーマ設定</Typography>
-              <TextField
-                label="プライマリカラー"
+
+              {/* カラーピッカー（プライマリカラー） */}
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                プライマリカラー
+              </Typography>
+              <ColorPicker
                 value={primaryColor}
-                onChange={handlePrimaryColorChange}
+                onChange={(color) => setPrimaryColor(color.hex)}
                 fullWidth
                 margin="normal"
               />
-              <TextField
-                label="セカンダリカラー"
+
+              {/* カラーピッカー（セカンダリカラー） */}
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                セカンダリカラー
+              </Typography>
+              <ColorPicker
                 value={secondaryColor}
-                onChange={handleSecondaryColorChange}
+                onChange={(color) => setSecondaryColor(color.hex)}
                 fullWidth
                 margin="normal"
               />
