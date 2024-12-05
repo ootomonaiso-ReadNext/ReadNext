@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "./AuthContext";
 import { db } from "../firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { useAuth } from "./AuthContext";
 
+// テーマリストの定義
 const themeList = {
   white: {
     name: "ホワイトテーマ",
@@ -38,6 +39,7 @@ const themeList = {
   },
 };
 
+// コンテキストの作成
 const ThemeContext = createContext();
 
 export const useThemeContext = () => useContext(ThemeContext);
@@ -57,6 +59,7 @@ const ThemeContextProvider = ({ children }) => {
 
         if (userDocSnap.exists()) {
           const settings = userDocSnap.data().settings || {};
+          console.log("Firestoreから取得したテーマ設定:", settings);
           setThemeId(settings.theme || "white");
           if (settings.customTheme) setCustomTheme(settings.customTheme);
         }
@@ -77,26 +80,41 @@ const ThemeContextProvider = ({ children }) => {
         "settings.customTheme": newCustomTheme,
       });
       setCustomTheme(newCustomTheme);
+      console.log("カスタムテーマをFirestoreに保存しました:", newCustomTheme);
     } catch (error) {
       console.error("カスタムテーマを保存できませんでした:", error);
     }
   };
 
   const theme = React.useMemo(() => {
+    console.log("現在のテーマID:", themeId);
+
+    let selectedTheme;
+
     if (themeId === "custom") {
-      return createTheme({
-        palette: {
-          ...themeList.custom.palette,
-          primary: { main: customTheme.primary.main },
-          secondary: { main: customTheme.secondary.main },
-        },
-      });
+      selectedTheme = {
+        ...themeList.custom.palette,
+        primary: { main: customTheme.primary.main },
+        secondary: { main: customTheme.secondary.main },
+      };
+    } else {
+      selectedTheme = themeList[themeId]?.palette || themeList.white.palette;
     }
-    return createTheme(themeList[themeId]?.palette);
+
+    console.log("生成前のテーマオブジェクト:", selectedTheme);
+
+    return createTheme({
+      palette: {
+        ...selectedTheme,
+        mode: themeId === "dark" ? "dark" : selectedTheme.mode || "light",
+      },
+    });
   }, [themeId, customTheme]);
 
   return (
-    <ThemeContext.Provider value={{ themeId, setThemeId, saveCustomTheme, customTheme, themeList }}>
+    <ThemeContext.Provider
+      value={{ themeId, setThemeId, saveCustomTheme, customTheme, themeList }}
+    >
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}
