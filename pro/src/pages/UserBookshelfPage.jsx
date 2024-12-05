@@ -86,16 +86,25 @@ const UserBookshelfPage = () => {
           あなたの蔵書
         </Typography>
 
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          to="/add-from-database"
-          startIcon={<AddIcon />}
-          sx={{ mb: 4 }}
+        {/* 固定ボタン */}
+        <Box
+          sx={{
+            position: "fixed",
+            top: "80px", // ヘッダーの下に固定
+            right: "20px", // 画面右端から20px
+            zIndex: 1100, // ヘッダーより上に表示
+          }}
         >
-          蔵書を追加する
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/add-from-database"
+            startIcon={<AddIcon />}
+          >
+            蔵書を追加する
+          </Button>
+        </Box>
 
         {loading ? (
           <Box display="flex" justifyContent="center" my={8}>

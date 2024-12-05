@@ -77,12 +77,11 @@ const Layout = ({ children }) => {
               display: "flex",
               justifyContent: "center",
               px: 2,
-              mt: 8, 
+              mt: 8, // ヘッダーの高さ分
+              pb: 11, // フッターの高さ分
             }}
           >
-            {children || (
-              <Typography>どうやってここまで?</Typography>
-            )}
+            {children || <Typography>どうやってここまで?</Typography>}
           </Box>
           <BottomNavigation
             showLabels
@@ -173,7 +172,7 @@ const Layout = ({ children }) => {
               flex: 1,
               p: 3,
               marginLeft: drawerOpen ? "240px" : "0",
-              marginTop: "64px", // ヘッダーの高さ分
+              marginTop: "64px", 
               transition: "margin-left 0.3s",
             }}
           >
