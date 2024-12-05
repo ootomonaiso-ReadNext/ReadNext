@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
-import { ColorPicker } from "@mui/lab";
+import { ChromePicker } from "react-color"; // react-colorのカラーピッカーをインポート
 import Layout from "../components/Layout";
 import { useThemeContext } from "../context/ThemeContext";
 
@@ -28,7 +28,7 @@ const UserSetting = () => {
 
   useEffect(() => {
     if (userData) {
-      setUsername(userData.userName || ""); // ユーザー名を直接取得
+      setUsername(userData.userName || "");
       const settings = userData.settings || {};
       if (settings.theme) setThemeId(settings.theme);
       if (settings.customTheme) {
@@ -46,7 +46,6 @@ const UserSetting = () => {
 
     try {
       const userDocRef = doc(db, "users", auth.currentUser.uid);
-      // usernameをsettingsの外に保存
       await updateDoc(userDocRef, { userName: username });
       await updateProfile(auth.currentUser, { displayName: username });
       await refreshUser();
@@ -134,23 +133,23 @@ const UserSetting = () => {
               <Typography variant="body1" sx={{ mt: 2 }}>
                 プライマリカラー
               </Typography>
-              <ColorPicker
-                value={primaryColor}
-                onChange={(color) => setPrimaryColor(color.hex)}
-                fullWidth
-                margin="normal"
-              />
+              <Box sx={{ mt: 2, display: "inline-block" }}>
+                <ChromePicker
+                  color={primaryColor}
+                  onChangeComplete={(color) => setPrimaryColor(color.hex)}
+                />
+              </Box>
 
               {/* カラーピッカー（セカンダリカラー） */}
               <Typography variant="body1" sx={{ mt: 2 }}>
                 セカンダリカラー
               </Typography>
-              <ColorPicker
-                value={secondaryColor}
-                onChange={(color) => setSecondaryColor(color.hex)}
-                fullWidth
-                margin="normal"
-              />
+              <Box sx={{ mt: 2, display: "inline-block" }}>
+                <ChromePicker
+                  color={secondaryColor}
+                  onChangeComplete={(color) => setSecondaryColor(color.hex)}
+                />
+              </Box>
             </Box>
           )}
 
