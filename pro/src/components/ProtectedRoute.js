@@ -35,25 +35,25 @@ const ProtectedRoute = ({ children }) => {
 
   // ローディング中はローディング表示
   if (loading) {
-    return <p>読み込み中...</p>; // 日本語で「読み込み中...」と表示
+    return <p>読み込み中...</p>; 
   }
 
-  // ユーザーが認証されていない場合はログインページへリダイレクト
+  // ユーザーが認証されていない場合はログインページへ
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // メールアドレスが未検証の場合はメール検証ページへリダイレクト
+  // メールアドレスが未検証の場合はメール検証ページへ
   if (!isEmailVerified) {
     return <Navigate to="/verify-email" replace />;
   }
 
-  // サービスアカウントが存在しない場合はアカウント作成ページへリダイレクト
+  // サービスアカウントが存在しない場合はアカウント作成ページへ
   if (hasServiceAccount === false) {
     return <Navigate to="/usermake" replace />;
   }
 
-  // すべての条件を満たしている場合は子コンポーネントを表示
+  // すべての条件を満たしている場合は子コンポーネントを表示させられるよ
   return children;
 };
 
