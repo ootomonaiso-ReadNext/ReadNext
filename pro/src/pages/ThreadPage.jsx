@@ -15,40 +15,51 @@ const ThreadPage = () => {
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState(null); 
   const [quote, setQuote] = useState(null); 
+  const [loading, setLoading] = useState(true); // ローディング状態管理
 
   // コメント一覧を取得
   const fetchComments = useCallback(async () => {
-    const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
-    const commentSnapshot = await getDocs(commentsRef);
-    
-    const commentList = await Promise.all(commentSnapshot.docs.map(async (docSnap) => {
-      const commentData = { id: docSnap.id, ...docSnap.data() };
+    try {
+      const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
+      const commentSnapshot = await getDocs(commentsRef);
 
-      if (commentData.userId) {
-        try {
-          const statusDocRef = doc(db, `users/${commentData.userId}/userBooks`, bookId);
-          const statusDoc = await getDoc(statusDocRef);
-          commentData.status = statusDoc.exists() ? statusDoc.data().status : "蔵書にない";
-        } catch (error) {
-          console.error(`Error fetching status for user ${commentData.userId}:`, error);
-          commentData.status = "取得エラー";
+      const commentList = await Promise.all(commentSnapshot.docs.map(async (docSnap) => {
+        const commentData = { id: docSnap.id, ...docSnap.data() };
+
+        if (commentData.userId) {
+          try {
+            const statusDocRef = doc(db, `users/${commentData.userId}/userBooks`, bookId);
+            const statusDoc = await getDoc(statusDocRef);
+            commentData.status = statusDoc.exists() ? statusDoc.data().status : "蔵書にない";
+          } catch (error) {
+            console.error(`Error fetching status for user ${commentData.userId}:`, error);
+            commentData.status = "取得エラー";
+          }
+        } else {
+          commentData.status = "未設定";
         }
-      } else {
-        commentData.status = "未設定";
-      }
 
-      return commentData;
-    }));
+        return commentData;
+      }));
 
-    setComments(commentList);
+      setComments(commentList);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
   }, [bookId, threadId]);
 
   useEffect(() => {
     const fetchThread = async () => {
-      const threadRef = collection(db, `books/${bookId}/threads`);
-      const threadDoc = await getDocs(threadRef);
-      const threadData = threadDoc.docs.find(doc => doc.id === threadId)?.data();
-      setThread(threadData);
+      try {
+        const threadRef = collection(db, `books/${bookId}/threads`);
+        const threadDoc = await getDocs(threadRef);
+        const threadData = threadDoc.docs.find(doc => doc.id === threadId)?.data();
+        setThread(threadData);
+      } catch (error) {
+        console.error("Error fetching thread:", error);
+      } finally {
+        setLoading(false); // ローディング状態を解除
+      }
     };
 
     fetchThread();
@@ -87,10 +98,18 @@ const ThreadPage = () => {
     setQuote(null);
   };
 
-  if (!thread) {
+  if (loading) {
     return (
       <Layout>
         <Typography variant="h6">Loading...</Typography>
+      </Layout>
+    );
+  }
+
+  if (!thread) {
+    return (
+      <Layout>
+        <Typography variant="h6">スレッドが見つかりません</Typography>
       </Layout>
     );
   }
@@ -101,7 +120,7 @@ const ThreadPage = () => {
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" fontWeight="bold">{thread.title}</Typography>
           <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
-            作成者: {thread.createdBy} - 作成日時: {thread.createdAt?.toDate().toLocaleString()}
+            作成者: {thread.createdBy} - 作成日時: {thread.createdAt?.toDate()?.toLocaleString() || "日時不明"}
           </Typography>
           
           <Typography variant="h6" gutterBottom>コメント</Typography>
@@ -122,7 +141,7 @@ const ThreadPage = () => {
                       <Typography variant="body1">{comment.text}</Typography>
                     </>
                   }
-                  secondary={`送信日時: ${comment.createdAt?.toDate().toLocaleString()}`}
+                  secondary={`送信日時: ${comment.createdAt?.toDate()?.toLocaleString() || "日時不明"}`}
                 />
                 <Button size="small" onClick={() => handleQuote(comment)}>
                   引用
