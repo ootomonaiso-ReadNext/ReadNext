@@ -164,14 +164,21 @@ const UserBookshelfPage = () => {
                     }}
                   >
                     <Box>
+                      {/* 書籍タイトルにリンクを追加 */}
                       <Typography
                         gutterBottom
                         variant="h6"
-                        component="h2"
+                        component={Link}
+                        to={`/books/${book.id}/threads`}
                         sx={{
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
+                          textDecoration: "none",
+                          color: "inherit",
+                          "&:hover": {
+                            textDecoration: "underline",
+                          },
                         }}
                       >
                         {book.title}
