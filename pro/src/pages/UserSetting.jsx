@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
+import { ChromePicker } from "react-color"; // react-colorのカラーピッカーをインポート
 import Layout from "../components/Layout";
 import { useThemeContext } from "../context/ThemeContext";
 
@@ -27,7 +28,7 @@ const UserSetting = () => {
 
   useEffect(() => {
     if (userData) {
-      setUsername(userData.userName || ""); // ユーザー名を直接取得
+      setUsername(userData.userName || "");
       const settings = userData.settings || {};
       if (settings.theme) setThemeId(settings.theme);
       if (settings.customTheme) {
@@ -37,9 +38,6 @@ const UserSetting = () => {
     }
   }, [userData, setThemeId]);
 
-  const handlePrimaryColorChange = (e) => setPrimaryColor(e.target.value);
-  const handleSecondaryColorChange = (e) => setSecondaryColor(e.target.value);
-
   const handleSaveUsername = async () => {
     if (!auth.currentUser) {
       setMessage("認証されていません。再ログインしてください。");
@@ -48,7 +46,6 @@ const UserSetting = () => {
 
     try {
       const userDocRef = doc(db, "users", auth.currentUser.uid);
-      // usernameをsettingsの外に保存
       await updateDoc(userDocRef, { userName: username });
       await updateProfile(auth.currentUser, { displayName: username });
       await refreshUser();
@@ -131,20 +128,28 @@ const UserSetting = () => {
           {themeId === "custom" && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">カスタムテーマ設定</Typography>
-              <TextField
-                label="プライマリカラー"
-                value={primaryColor}
-                onChange={handlePrimaryColorChange}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="セカンダリカラー"
-                value={secondaryColor}
-                onChange={handleSecondaryColorChange}
-                fullWidth
-                margin="normal"
-              />
+
+              {/* カラーピッカー（プライマリカラー） */}
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                プライマリカラー
+              </Typography>
+              <Box sx={{ mt: 2, display: "inline-block" }}>
+                <ChromePicker
+                  color={primaryColor}
+                  onChangeComplete={(color) => setPrimaryColor(color.hex)}
+                />
+              </Box>
+
+              {/* カラーピッカー（セカンダリカラー） */}
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                セカンダリカラー
+              </Typography>
+              <Box sx={{ mt: 2, display: "inline-block" }}>
+                <ChromePicker
+                  color={secondaryColor}
+                  onChangeComplete={(color) => setSecondaryColor(color.hex)}
+                />
+              </Box>
             </Box>
           )}
 
