@@ -6,54 +6,56 @@ import { Box, Container, Typography, List, ListItem, ListItemText, TextField, Bu
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/Layout"; 
 
-// スレッドページ
 const ThreadPage = () => {
   const { bookId, threadId } = useParams();
   const { user } = useAuth();
-  const [thread, setThread] = useState(null); 
-  const [comments, setComments] = useState([]); 
+  const [thread, setThread] = useState(null);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [replyTo, setReplyTo] = useState(null); 
-  const [quote, setQuote] = useState(null); 
+  const [loading, setLoading] = useState(true);
 
-  // コメント一覧を取得
-  const fetchComments = useCallback(async () => {
-    const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
-    const commentSnapshot = await getDocs(commentsRef);
-    
-    const commentList = await Promise.all(commentSnapshot.docs.map(async (docSnap) => {
-      const commentData = { id: docSnap.id, ...docSnap.data() };
+  // Fetch thread data
+  const fetchThread = useCallback(async () => {
+    try {
+      const threadRef = doc(db, `books/${bookId}/threads/${threadId}`);
+      const threadDoc = await getDoc(threadRef);
 
-      if (commentData.userId) {
-        try {
-          const statusDocRef = doc(db, `users/${commentData.userId}/userBooks`, bookId);
-          const statusDoc = await getDoc(statusDocRef);
-          commentData.status = statusDoc.exists() ? statusDoc.data().status : "蔵書にない";
-        } catch (error) {
-          console.error(`Error fetching status for user ${commentData.userId}:`, error);
-          commentData.status = "取得エラー";
-        }
+      if (threadDoc.exists()) {
+        setThread({ id: threadDoc.id, ...threadDoc.data() });
       } else {
-        commentData.status = "未設定";
+        console.warn("スレッドが存在しません");
+        setThread(null);
       }
+    } catch (error) {
+      console.error("スレッドデータの取得エラー:", error);
+      setThread(null);
+    }
+  }, [bookId, threadId]);
 
-      return commentData;
-    }));
-
-    setComments(commentList);
+  // Fetch comments
+  const fetchComments = useCallback(async () => {
+    try {
+      const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
+      const commentSnapshot = await getDocs(commentsRef);
+      const commentList = commentSnapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+      setComments(commentList);
+    } catch (error) {
+      console.error("コメントデータの取得エラー:", error);
+    }
   }, [bookId, threadId]);
 
   useEffect(() => {
-    const fetchThread = async () => {
-      const threadRef = collection(db, `books/${bookId}/threads`);
-      const threadDoc = await getDocs(threadRef);
-      const threadData = threadDoc.docs.find(doc => doc.id === threadId)?.data();
-      setThread(threadData);
+    const loadData = async () => {
+      await fetchThread();
+      await fetchComments();
+      setLoading(false);
     };
 
-    fetchThread();
-    fetchComments();
-  }, [bookId, threadId, fetchComments]);
+    loadData();
+  }, [fetchThread, fetchComments]);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -65,32 +67,30 @@ const ThreadPage = () => {
         createdBy: user?.userName || "匿名ユーザー",
         userId: user?.uid,
         createdAt: serverTimestamp(),
-        replyTo: replyTo || null,
-        quote: quote || null,
       });
       setNewComment("");
-      setReplyTo(null);
-      setQuote(null);
-      fetchComments();
+      await fetchComments();
     } catch (error) {
-      console.error("Error adding comment:", error);
+      console.error("コメントの追加エラー:", error);
     }
   };
 
-  const handleQuote = (comment) => {
-    setQuote(comment.text);
-    setReplyTo(comment.id);
-  };
-
-  const handleCancelReply = () => {
-    setReplyTo(null);
-    setQuote(null);
-  };
+  if (loading) {
+    return (
+      <Layout>
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+          <Typography variant="h6">読み込み中...</Typography>
+        </Container>
+      </Layout>
+    );
+  }
 
   if (!thread) {
     return (
       <Layout>
-        <Typography variant="h6">Loading...</Typography>
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+          <Typography variant="h6">スレッドが見つかりません。</Typography>
+        </Container>
       </Layout>
     );
   }
@@ -103,7 +103,7 @@ const ThreadPage = () => {
           <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
             作成者: {thread.createdBy} - 作成日時: {thread.createdAt?.toDate().toLocaleString()}
           </Typography>
-          
+
           <Typography variant="h6" gutterBottom>コメント</Typography>
           <List>
             {comments.map((comment) => (
@@ -111,32 +111,17 @@ const ThreadPage = () => {
                 <ListItemText
                   primary={
                     <>
-                      <Typography variant="subtitle2">
-                        {comment.createdBy} {comment.status && `（読書状況: ${comment.status}）`}
-                      </Typography>
-                      {comment.quote && (
-                        <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
-                          {`引用: "${comment.quote}"`}
-                        </Typography>
-                      )}
+                      <Typography variant="subtitle2">{comment.createdBy}</Typography>
                       <Typography variant="body1">{comment.text}</Typography>
                     </>
                   }
                   secondary={`送信日時: ${comment.createdAt?.toDate().toLocaleString()}`}
                 />
-                <Button size="small" onClick={() => handleQuote(comment)}>
-                  引用
-                </Button>
               </ListItem>
             ))}
           </List>
 
           <Box sx={{ mt: 4 }}>
-            {quote && (
-              <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
-                {`引用: "${quote}"`}
-              </Typography>
-            )}
             <TextField
               label="コメントを入力 (1200字まで)"
               variant="outlined"
@@ -151,11 +136,6 @@ const ThreadPage = () => {
             <Button variant="contained" color="primary" onClick={handleAddComment}>
               コメントを追加
             </Button>
-            {replyTo && (
-              <Button variant="text" color="secondary" onClick={handleCancelReply}>
-                返信をキャンセル
-              </Button>
-            )}
           </Box>
         </Box>
       </Container>

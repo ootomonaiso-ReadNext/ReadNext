@@ -90,9 +90,9 @@ const UserBookshelfPage = () => {
         <Box
           sx={{
             position: "fixed",
-            top: "80px", // ヘッダーの下に固定
-            right: "20px", // 画面右端から20px
-            zIndex: 1100, // ヘッダーより上に表示
+            top: "80px", 
+            right: "20px", 
+            zIndex: 1100, 
           }}
         >
           <Button

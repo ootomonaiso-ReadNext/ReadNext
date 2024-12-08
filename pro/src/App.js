@@ -87,7 +87,7 @@ function App() {
             }
           />
           <Route
-            path="/books/:bookId/threads/:threadId"
+            path="/books/:bookId/threads/:threadId/comments"
             element={
               <ProtectedRoute>
                 <ThreadPage />

@@ -15,43 +15,76 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser); // Firebase認証オブジェクトをセット
-        setIsEmailVerified(currentUser.emailVerified);
+      try {
+        console.log("認証状態が変更されました:", currentUser);
 
-        // Firestoreから追加データを取得
-        try {
+        if (currentUser) {
+          // Firebase認証データを設定
+          setUser(currentUser);
+          setIsEmailVerified(currentUser.emailVerified);
+
+          // Firestoreからユーザーデータを取得
           const userDoc = await getDoc(doc(db, "users", currentUser.uid));
           if (userDoc.exists()) {
-            setUserData(userDoc.data()); // Firestoreのデータをセット
+            console.log("Firestoreからのユーザーデータ:", userDoc.data());
+            setUserData(userDoc.data());
           } else {
-            setUserData(null);
+            console.warn("Firestoreに該当するユーザーデータが見つかりません。");
+            setUserData({
+              displayName: "NotFoundMan",
+              email: "unknown@example.com",
+            });
           }
-        } catch (error) {
-          console.error("Firestoreからのデータ取得エラー:", error);
-          setUserData(null);
+        } else {
+          // 未認証ユーザー用のデフォルト値
+          console.log("ユーザーは未認証です。デフォルト値を設定します。");
+          setUser(null);
+          setUserData({
+            displayName: "Guest",
+            email: "guest@example.com",
+          });
+          setIsEmailVerified(false);
         }
-      } else {
+      } catch (error) {
+        console.error("認証状態変更時のエラー:", error);
         setUser(null);
-        setUserData(null);
+        setUserData({
+          displayName: "ErrorMan",
+          email: "error@example.com",
+        });
         setIsEmailVerified(false);
+      } finally {
+        setLoading(false); // ローディング終了
       }
-      setLoading(false); // ローディング終了
     });
 
     return () => unsubscribe();
   }, []);
 
+  // ユーザー情報をリロード
   const refreshUser = async () => {
     if (auth.currentUser) {
-      await reload(auth.currentUser);
-      setUser(auth.currentUser); // Firebaseユーザーをリロード
-      setIsEmailVerified(auth.currentUser.emailVerified);
+      try {
+        await reload(auth.currentUser);
+        setUser(auth.currentUser);
+        setIsEmailVerified(auth.currentUser.emailVerified);
+        console.log("ユーザー情報がリロードされました:", auth.currentUser);
+      } catch (error) {
+        console.error("ユーザーリロード中のエラー:", error);
+      }
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, userData, setUser, isEmailVerified, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        userData,
+        setUser,
+        isEmailVerified,
+        refreshUser,
+      }}
+    >
       {!loading ? children : <p>ユーザーデータをロード中...</p>}
     </AuthContext.Provider>
   );
