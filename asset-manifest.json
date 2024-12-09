@@ -1,11 +1,10 @@
 {
   "files": {
-    "main.js": "/ReadNext/static/js/main.151ecc45.js",
-    "static/media/deficon.png": "/ReadNext/static/media/deficon.ff961b42b460beb2371d.png",
+    "main.js": "/ReadNext/static/js/main.e1825b5a.js",
     "index.html": "/ReadNext/index.html",
-    "main.151ecc45.js.map": "/ReadNext/static/js/main.151ecc45.js.map"
+    "main.e1825b5a.js.map": "/ReadNext/static/js/main.e1825b5a.js.map"
   },
   "entrypoints": [
-    "static/js/main.151ecc45.js"
+    "static/js/main.e1825b5a.js"
   ]
 }
