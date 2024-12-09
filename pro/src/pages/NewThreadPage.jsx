@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import Layout from "../components/Layout"; // へっだー
+import Layout from "../components/Layout"; // ヘッダー
 
 // 新しいスレッドを作成するページ
 const NewThreadPage = () => {
@@ -39,11 +39,13 @@ const NewThreadPage = () => {
     try {
       const threadsRef = collection(db, `books/${bookId}/threads`);
       const userName = user?.userName || userData?.displayName || "UnknownUser";
+      const userDisplayName = userData?.displayName || "Unknown User";
 
       // スレッドを作成
       const threadDoc = await addDoc(threadsRef, {
         title: title.trim(),
-        createdBy: userName,
+        createdBy: userName, // ユーザーIDまたは識別子
+        createdByName: userDisplayName, // 表示名
         createdAt: serverTimestamp(),
       });
 
@@ -53,7 +55,8 @@ const NewThreadPage = () => {
       const commentsRef = collection(db, `books/${bookId}/threads/${threadDoc.id}/comments`);
       await addDoc(commentsRef, {
         text: initialComment.trim(),
-        createdBy: userName,
+        createdBy: userName, // ユーザーIDまたは識別子
+        createdByName: userDisplayName, // 表示名
         createdAt: serverTimestamp(),
       });
 
