@@ -13,17 +13,16 @@ import {
   Card,
   CardMedia,
   CardContent,
+  Grid,
 } from "@mui/material";
-import Layout from "../components/Layout"; // Layoutをインポート
+import Layout from "../components/Layout";
 
-// スレッド一覧ページ
 const ThreadListPage = () => {
   const { bookId } = useParams();
   const [threads, setThreads] = useState([]);
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Firestoreからスレッド一覧を取得
   useEffect(() => {
     const fetchThreads = async () => {
       const threadsRef = collection(db, `books/${bookId}/threads`);
@@ -58,30 +57,49 @@ const ThreadListPage = () => {
   return (
     <Layout>
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        {/* 本の情報を表示するヘッダー */}
         {book && (
-          <Card sx={{ display: "flex", mb: 4 }}>
-            <CardMedia
-              component="img"
-              sx={{ width: 150 }}
-              image={book.thumbnail}
-              alt={book.title}
-            />
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {book.title}
-              </Typography>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                著者: {book.authors}
-              </Typography>
-              <Typography variant="body1">{book.description}</Typography>
-            </CardContent>
+          <Card sx={{ mb: 4 }}>
+            <Grid container spacing={2}>
+              <Grid 
+                item 
+                xs={12} 
+                sm={4} 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center' 
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  sx={{
+                    maxWidth: '100%',
+                    aspectRatio: '3/4', 
+                    objectFit: 'cover', 
+                  }}
+                  image={book.thumbnail}
+                  alt={book.title}
+                />
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <CardContent>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    {book.title}
+                  </Typography>
+                  <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                    著者: {book.authors}
+                  </Typography>
+                  <Typography variant="body1">{book.description}</Typography>
+                </CardContent>
+              </Grid>
+            </Grid>
           </Card>
         )}
 
-        {/* スレッド一覧 */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>スレッド一覧</Typography>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            スレッド一覧
+          </Typography>
           <Button
             variant="contained"
             component={Link}
@@ -99,7 +117,10 @@ const ThreadListPage = () => {
                 to={`/books/${bookId}/threads/${thread.id}/comments`}
                 button
               >
-                <ListItemText primary={thread.title} secondary={`作成者: ${thread.createdBy}`} />
+                <ListItemText 
+                  primary={thread.title} 
+                  secondary={`作成者: ${thread.createdBy}`} 
+                />
               </ListItem>
             ))}
           </List>
