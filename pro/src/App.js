@@ -95,7 +95,7 @@ function App() {
             }
           />
 
-          {/* 404ページ */}
+          {/* 404ページいつかちゃんとページつくるよ */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ThemeContextProvider>
