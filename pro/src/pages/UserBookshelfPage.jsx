@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext"; 
 import { db } from "../firebaseConfig";
-import { collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, updateDoc, addDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import {
   Typography,
@@ -67,8 +67,19 @@ const UserBookshelfPage = () => {
 
   const handleStatusChange = async (bookId, newStatus) => {
     try {
+      // ステータスの更新
       const userBookRef = doc(db, "users", user.uid, "userBooks", bookId);
       await updateDoc(userBookRef, { status: newStatus });
+
+      // ステータス変更の履歴を記録
+      const statusHistoryRef = collection(db, "users", user.uid, "userBooks", bookId, "statusHistory");
+      await addDoc(statusHistoryRef, {
+        status: newStatus,
+        changedAt: new Date(),
+        changedBy: user.displayName || user.email, // ユーザー名を保存
+      });
+
+      // ローカルのステータス更新
       setBooks((prevBooks) =>
         prevBooks.map((book) =>
           book.id === bookId ? { ...book, status: newStatus } : book
@@ -164,7 +175,6 @@ const UserBookshelfPage = () => {
                     }}
                   >
                     <Box>
-                      {/* 書籍タイトルにリンクを追加 */}
                       <Typography
                         gutterBottom
                         variant="h6"
