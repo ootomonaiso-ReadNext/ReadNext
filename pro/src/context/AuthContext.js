@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
             setUserData({
               displayName: "NotFoundMan",
               email: "unknown@example.com",
+              userName: "UnknownUser",
             });
           }
         } else {
@@ -42,6 +43,7 @@ export const AuthProvider = ({ children }) => {
           setUserData({
             displayName: "Guest",
             email: "guest@example.com",
+            userName: "Guest",
           });
           setIsEmailVerified(false);
         }
@@ -51,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         setUserData({
           displayName: "ErrorMan",
           email: "error@example.com",
+          userName: "ErrorUser",
         });
         setIsEmailVerified(false);
       } finally {

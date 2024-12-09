@@ -14,7 +14,7 @@ import {
   CardMedia,
   CardContent,
 } from "@mui/material";
-
+import Layout from "../components/Layout"; // Layoutをインポート
 
 // スレッド一覧ページ
 const ThreadListPage = () => {
@@ -47,61 +47,65 @@ const ThreadListPage = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Typography variant="h6" align="center">読み込み中...</Typography>
-      </Container>
+      <Layout>
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+          <Typography variant="h6" align="center">読み込み中...</Typography>
+        </Container>
+      </Layout>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      {/* 本の情報を表示するヘッダー */}
-      {book && (
-        <Card sx={{ display: "flex", mb: 4 }}>
-          <CardMedia
-            component="img"
-            sx={{ width: 150 }}
-            image={book.thumbnail}
-            alt={book.title}
-          />
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              {book.title}
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-              著者: {book.authors}
-            </Typography>
-            <Typography variant="body1">{book.description}</Typography>
-          </CardContent>
-        </Card>
-      )}
+    <Layout>
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        {/* 本の情報を表示するヘッダー */}
+        {book && (
+          <Card sx={{ display: "flex", mb: 4 }}>
+            <CardMedia
+              component="img"
+              sx={{ width: 150 }}
+              image={book.thumbnail}
+              alt={book.title}
+            />
+            <CardContent>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                {book.title}
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                著者: {book.authors}
+              </Typography>
+              <Typography variant="body1">{book.description}</Typography>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* スレッド一覧 */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>スレッド一覧</Typography>
-        <Button
-          variant="contained"
-          component={Link}
-          to={`/books/${bookId}/new-thread`}
-          color="primary"
-          sx={{ mb: 2 }}
-        >
-          新しいスレッドを作成
-        </Button>
-        <List>
-          {threads.map((thread) => (
-            <ListItem
-              key={thread.id}
-              component={Link}
-              to={`/books/${bookId}/threads/${thread.id}/comments`}
-              button
-            >
-              <ListItemText primary={thread.title} secondary={`作成者: ${thread.createdBy}`} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-    </Container>
+        {/* スレッド一覧 */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>スレッド一覧</Typography>
+          <Button
+            variant="contained"
+            component={Link}
+            to={`/books/${bookId}/new-thread`}
+            color="primary"
+            sx={{ mb: 2 }}
+          >
+            新しいスレッドを作成
+          </Button>
+          <List>
+            {threads.map((thread) => (
+              <ListItem
+                key={thread.id}
+                component={Link}
+                to={`/books/${bookId}/threads/${thread.id}/comments`}
+                button
+              >
+                <ListItemText primary={thread.title} secondary={`作成者: ${thread.createdBy}`} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Container>
+    </Layout>
   );
 };
 
