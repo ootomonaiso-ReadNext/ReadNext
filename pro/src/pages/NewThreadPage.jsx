@@ -4,35 +4,35 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { Box, Container, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import Layout from "../components/Layout"; // へっだー
+import Layout from "../components/Layout";
 
-// 新しいスレッドを作成するページ
 const NewThreadPage = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth(); // AuthContext から user を取得
+  const { userData } = useAuth();
   const [title, setTitle] = useState("");
-  const [loading, setLoading] = useState(true); // ユーザー情報のロードを追跡する状態
+  const [loading, setLoading] = useState(true);
 
+  // ユーザーデータが取得できたか確認
   useEffect(() => {
-    if (user && user.userName) {
-      setLoading(false);
+    if (userData?.userName) {
+      setLoading(false); // ローディング解除
     }
-  }, [user]);
+  }, [userData]);
 
   const handleCreateThread = async () => {
-    if (!title || !user?.userName) return;
+    if (!title || !userData?.userName) return;
 
     try {
       const threadsRef = collection(db, `books/${bookId}/threads`);
       await addDoc(threadsRef, {
         title: title,
-        createdBy: user.userName,
+        createdBy: userData.userName, // Firestoreのユーザー名を使用
         createdAt: serverTimestamp(),
       });
       navigate(`/books/${bookId}/threads`);
     } catch (error) {
-      console.error("Error creating thread:", error);
+      console.error("スレッド作成エラー:", error);
     }
   };
 
@@ -67,7 +67,7 @@ const NewThreadPage = () => {
             variant="contained"
             color="primary"
             onClick={handleCreateThread}
-            disabled={!user?.userName}
+            disabled={!userData?.userName}
           >
             作成
           </Button>

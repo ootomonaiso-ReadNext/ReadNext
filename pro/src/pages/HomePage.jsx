@@ -2,7 +2,6 @@ import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import {
-  Avatar,
   Button,
   Container,
   Card,
@@ -19,14 +18,11 @@ import {
   MenuBook as MenuBookIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material";
-import defaultAvatar from "../img/deficon.png";
 import Layout from "../components/Layout";
 
 const HomePage = () => {
   const { user } = useAuth();
   const theme = useTheme();
-
-  console.log("現在のテーマ:", theme.palette); // デバッグ用
 
   return (
     <Layout>
@@ -54,16 +50,6 @@ const HomePage = () => {
                   color: "white",
                 }}
               >
-                <Avatar
-                  src={user?.photoURL || defaultAvatar}
-                  alt="User Avatar"
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    border: "3px solid white",
-                    mr: 2,
-                  }}
-                />
                 <Box>
                   <Typography variant="h5" fontWeight="bold">
                     {user ? `ようこそ、${user.email}さん` : "ログインしてください"}

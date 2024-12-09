@@ -4,51 +4,56 @@ import { collection, getDocs, addDoc, serverTimestamp, doc, getDoc } from "fireb
 import { db } from "../firebaseConfig";
 import { Box, Container, Typography, List, ListItem, ListItemText, TextField, Button } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import Layout from "../components/Layout"; // Layoutをインポート
+import Layout from "../components/Layout";
 
-// スレッドページ
 const ThreadPage = () => {
   const { bookId, threadId } = useParams();
   const { user } = useAuth();
-  const [thread, setThread] = useState(null); 
-  const [comments, setComments] = useState([]); 
+  const [thread, setThread] = useState(null);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [replyTo, setReplyTo] = useState(null); 
-  const [quote, setQuote] = useState(null); 
+  const [replyTo, setReplyTo] = useState(null);
+  const [quote, setQuote] = useState(null);
 
-  // コメント一覧を取得
   const fetchComments = useCallback(async () => {
     const commentsRef = collection(db, `books/${bookId}/threads/${threadId}/comments`);
     const commentSnapshot = await getDocs(commentsRef);
-    
-    const commentList = await Promise.all(commentSnapshot.docs.map(async (docSnap) => {
-      const commentData = { id: docSnap.id, ...docSnap.data() };
 
-      if (commentData.userId) {
-        try {
-          const statusDocRef = doc(db, `users/${commentData.userId}/userBooks`, bookId);
-          const statusDoc = await getDoc(statusDocRef);
-          commentData.status = statusDoc.exists() ? statusDoc.data().status : "蔵書にない";
-        } catch (error) {
-          console.error(`Error fetching status for user ${commentData.userId}:`, error);
-          commentData.status = "取得エラー";
+    const commentList = await Promise.all(
+      commentSnapshot.docs.map(async (docSnap) => {
+        const commentData = { id: docSnap.id, ...docSnap.data() };
+
+        if (commentData.userId) {
+          try {
+            const userDocRef = doc(db, "users", commentData.userId);
+            const userDoc = await getDoc(userDocRef);
+
+            commentData.createdBy = userDoc.exists() ? userDoc.data().userName : "不明なユーザー";
+          } catch (error) {
+            console.error(`Error fetching userName for user ${commentData.userId}:`, error);
+            commentData.createdBy = "取得エラー";
+          }
+        } else {
+          commentData.createdBy = "未設定";
         }
-      } else {
-        commentData.status = "未設定";
-      }
 
-      return commentData;
-    }));
+        return commentData;
+      })
+    );
 
     setComments(commentList);
   }, [bookId, threadId]);
 
   useEffect(() => {
     const fetchThread = async () => {
-      const threadRef = collection(db, `books/${bookId}/threads`);
-      const threadDoc = await getDocs(threadRef);
-      const threadData = threadDoc.docs.find(doc => doc.id === threadId)?.data();
-      setThread(threadData);
+      const threadRef = doc(db, `books/${bookId}/threads`, threadId);
+      const threadDoc = await getDoc(threadRef);
+
+      if (threadDoc.exists()) {
+        setThread(threadDoc.data());
+      } else {
+        console.error("Thread not found");
+      }
     };
 
     fetchThread();
@@ -103,7 +108,7 @@ const ThreadPage = () => {
           <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
             作成者: {thread.createdBy} - 作成日時: {thread.createdAt?.toDate().toLocaleString()}
           </Typography>
-          
+
           <Typography variant="h6" gutterBottom>コメント</Typography>
           <List>
             {comments.map((comment) => (
@@ -111,11 +116,13 @@ const ThreadPage = () => {
                 <ListItemText
                   primary={
                     <>
-                      <Typography variant="subtitle2">
-                        {comment.createdBy} {comment.status && `（読書状況: ${comment.status}）`}
-                      </Typography>
+                      <Typography variant="subtitle2">{comment.createdBy}</Typography>
                       {comment.quote && (
-                        <Typography variant="body2" color="textSecondary" sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          sx={{ pl: 2, borderLeft: "2px solid #ccc", mb: 1 }}
+                        >
                           {`引用: "${comment.quote}"`}
                         </Typography>
                       )}
@@ -124,9 +131,7 @@ const ThreadPage = () => {
                   }
                   secondary={`送信日時: ${comment.createdAt?.toDate().toLocaleString()}`}
                 />
-                <Button size="small" onClick={() => handleQuote(comment)}>
-                  引用
-                </Button>
+                <Button size="small" onClick={() => handleQuote(comment)}>引用</Button>
               </ListItem>
             ))}
           </List>
@@ -138,7 +143,7 @@ const ThreadPage = () => {
               </Typography>
             )}
             <TextField
-              label="コメントを入力 (1200字まで)"
+              label="コメントを入力"
               variant="outlined"
               fullWidth
               multiline
@@ -146,7 +151,6 @@ const ThreadPage = () => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               sx={{ mb: 2 }}
-              inputProps={{ maxLength: 1200 }}
             />
             <Button variant="contained" color="primary" onClick={handleAddComment}>
               コメントを追加

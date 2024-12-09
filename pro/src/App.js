@@ -87,7 +87,7 @@ function App() {
             }
           />
           <Route
-            path="/books/:bookId/threads/:threadId"
+            path="/books/:bookId/threads/:threadId/comments"
             element={
               <ProtectedRoute>
                 <ThreadPage />
@@ -95,7 +95,7 @@ function App() {
             }
           />
 
-          {/* 404ページ */}
+          {/* 404ページいつかちゃんとページつくるよ */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ThemeContextProvider>

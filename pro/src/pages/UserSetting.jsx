@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   Radio,
 } from "@mui/material";
-import { ChromePicker } from "react-color"; // react-colorのカラーピッカーをインポート
+import { ChromePicker } from "react-color"; // react-colorのカラーピッカーにするしかなかった
 import Layout from "../components/Layout";
 import { useThemeContext } from "../context/ThemeContext";
 
