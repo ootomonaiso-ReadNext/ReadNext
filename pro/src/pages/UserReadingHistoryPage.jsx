@@ -100,9 +100,10 @@ const UserReadingHistoryPage = () => {
                       <strong>変更日:</strong>{" "}
                       {entry.changedAt.toLocaleString("ja-JP")}
                     </Typography>
-                    <Typography variant="body1">
+                    {/* ユーザー名（変更者）は表示しない */}
+                    {/* <Typography variant="body1">
                       <strong>変更者:</strong> {entry.changedBy}
-                    </Typography>
+                    </Typography> */}
                   </CardContent>
                 </Card>
               </Grid>
