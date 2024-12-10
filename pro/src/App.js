@@ -96,9 +96,9 @@ function App() {
             }
           />
 
-          {/* 読書履歴ページ */}
+          {/* 他のユーザーの読書履歴ページ */}
           <Route
-            path="/reading-history"
+            path="/user/:userId/reading-history"
             element={
               <ProtectedRoute>
                 <UserReadingHistoryPage />
