@@ -16,7 +16,7 @@ import UserMake from "./pages/UserMake";
 import PasswordReset from "./pages/PasswordReset";
 import VerifyEmail from "./pages/VerifyEmail";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserReadingHistoryPage from "./pages/UserReadingHistoryPage"; // 追加
+import UserReadingHistoryPage from "./pages/UserReadingHistoryPage";
 
 function App() {
   return (
@@ -95,10 +95,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* 読書履歴ページ */}
+          {/* 他のユーザーの読書履歴ページ */}
           <Route
-            path="/reading-history"
+            path="/user/:userId/reading-history"
             element={
               <ProtectedRoute>
                 <UserReadingHistoryPage />
