@@ -6,3 +6,4 @@
 ```
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
+めざせ年明け前完成!!!
