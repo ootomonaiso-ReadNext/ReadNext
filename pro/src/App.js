@@ -23,14 +23,14 @@ function App() {
     <AuthProvider>
       <ThemeContextProvider>
         <Routes>
-          {/* 公開ルート */}
+          {/* 認証いらずルート */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/usermake" element={<UserMake />} />
           <Route path="/password-reset" element={<PasswordReset />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
-          {/* 保護されたルート */}
+          {/* 保護ルート */}
           <Route
             path="/"
             element={
