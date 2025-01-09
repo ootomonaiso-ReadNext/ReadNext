@@ -76,7 +76,25 @@ style: |
 ---
 <!-- class: content-slide -->
 # ログイン方法
- 
+## Firebaseに搭載されているログイン関連実装を利用
+- Node.jsにあるFirebaseの拡張機能の関数で実装
+- Googleアカウントの場合はGoogleOAuth
+- 他のメールアドレスは認証メールによる確認を経てアカウント作成
 
 ---
+<!-- class: content-slide -->
+# 書籍の検索
+- GoogleBooksAPIは認証不要で戻り値がJsonのため採用
+- 一度APIを利用し取得したデータはデータベースに登録
+- サムネイル画像はGoogleBooksのリンクを設定
+
+---
+# 蔵書関連
+- usersテーブルに蔵書を登録するコレクションが存在
+- booksテーブルの本IDを蔵書のキーとして保存
+- 蔵書の呼び出し時、usersの蔵書を取得後booksに問い合わせ
+- 蔵書追加日と状態を保存
+
+---
+# 
 
