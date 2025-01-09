@@ -65,17 +65,18 @@ style: |
 - 書籍検索
 
 ---
-# システム構成
-
-
----
-
 <!-- class: content-slide -->
-# 他端末とのデータの同期対応
-- Googleログイン、メールアドレスログインに対応
-- Googleユーザーは2段階認証なしで利用開始可能
-- OAuthはGoogleのみの対応
+# 利用技術
+- データベース: Firebase Firestore Database
+- デプロイ先: GitHubActionsでビルドGitHubPagesにデプロイ
+- 書籍情報取得: GoogleBooksAPI
 
-**アカウント単位でのデータ同期可能**
+いずれも無料で利用できる範囲で構築
 
 ---
+<!-- class: content-slide -->
+# ログイン方法
+ 
+
+---
+
