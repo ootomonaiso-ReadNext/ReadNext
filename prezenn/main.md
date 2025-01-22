@@ -50,6 +50,22 @@ style: |
     background-color: rgb(255, 255, 255);
   }
 
+  .left-image-right-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+  .left-image-right-text img {
+    max-width: 45%;
+    height: auto;
+  }
+  .left-image-right-text .text-content {
+    max-width: 50%;
+    padding-left: 2rem;
+  }
+
 ---
 <!-- class: title-slide -->
 # ReadNext
@@ -134,8 +150,39 @@ style: |
 ---
 <!-- class: content-slide -->
 # CI/CDの実装
-```yml
+- GitHub Actionsの実行内容と実行フラグを管理するコンフィグ
 
-```
+![w:20em](yamu1.png)
 
 ---
+# CI/CDコード解説
+- build-and-deployはビルドとデプロイを行う命令
+- 実行環境はubuntuの最終環境を利用
+![w:20em](yamu2.png)
+
+---
+![w:20em](yamu3.png)
+
+---
+# 認証認可システム
+<section class="left-image-right-text">
+  <img src="app1.png" alt="画像">
+  <div class="text-content">
+    <ul>
+      <li>認証状態が必要かどうかを宣言</li>
+      <li>ProtectedRouteタグで認証必要部分を囲う</li>
+    </ul>
+  </div>
+</section>
+
+---
+# 認証認可システム -アカウント制御
+<section class="left-image-right-text">
+  <img src="app2.png" alt="画像">
+  <div class="text-content">
+    <ul>
+      <li>このアプリケーションにアクセスしたら実行されるコード</li>
+      <li>認証情報を読み取り、</br>どこへリダイレクトするか判定</li>
+    </ul>
+  </div>
+</section>
