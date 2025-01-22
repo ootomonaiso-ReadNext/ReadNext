@@ -49,12 +49,13 @@ style: |
   section.content-slide {
     background-color: rgb(255, 255, 255);
   }
----
 
+---
 <!-- class: title-slide -->
 # ReadNext
 ## 蔵書管理用Webサービスの紹介
 
+### https://ootomonaiso-readnext.github.io/ReadNext/
 ---
 
 <!-- class: content-slide -->
@@ -70,8 +71,30 @@ style: |
 - データベース: Firebase Firestore Database
 - デプロイ先: GitHubActionsでビルドGitHubPagesにデプロイ
 - 書籍情報取得: GoogleBooksAPI
+- GitHub・Git
+- VSCode
 
 いずれも無料で利用できる範囲で構築
+
+---
+<!-- class: content-slide -->
+# システム構成
+![w:20em](sys.png)
+
+---
+<!-- class: content-slide -->
+# Reactの利点
+- バックエンドから独立してサーバーレスで動作する
+- 仮想DOMで必要な部分だけ更新するシングルページアプリケーション
+- JavaScript・TypeScriptで書ける
+
+---
+<!-- class: content-slide -->
+# このサイトの寿命
+- GitHub保存容量が約5GBを超え
+- Firebaseの読み取り回数5万越え
+- Firebaseの書き込み・削除回数2万超え
+- 2040年11月26日になった瞬間
 
 ---
 <!-- class: content-slide -->
@@ -83,12 +106,25 @@ style: |
 
 ---
 <!-- class: content-slide -->
+# OAuthとは
+- 認可リクエストを送る
+- GoogleやGitHubなどのOAuthプロバイダーにアクセス
+- 認証されたら認可コードを返す
+- 認可コードからアクセストークンを取りに行く
+## データ漏洩リスクは低い
+
+---
+<!-- class: content-slide -->
 # 書籍の検索
 - GoogleBooksAPIは認証不要で戻り値がJsonのため採用
 - 一度APIを利用し取得したデータはデータベースに登録
 - サムネイル画像はGoogleBooksのリンクを設定
 
+## APIアクセス制限のためにアクセス回数を減らす
+## 画像保存を無くしてサーバー容量の削減
+
 ---
+<!-- class: content-slide -->
 # 蔵書関連
 - usersテーブルに蔵書を登録するコレクションが存在
 - booksテーブルの本IDを蔵書のキーとして保存
@@ -96,4 +132,10 @@ style: |
 - 蔵書追加日と状態を保存
 
 ---
+<!-- class: content-slide -->
+# CI/CDの実装
+```yml
 
+```
+
+---
