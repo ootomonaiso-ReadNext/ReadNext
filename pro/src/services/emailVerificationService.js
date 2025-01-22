@@ -5,7 +5,7 @@ import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailL
 export const sendVerificationEmail = async (email) => {
   const auth = getAuth();
   const actionCodeSettings = {
-    // ユーザーがリンクをクリックした後のリダイレクトURL
+    // ユーザーがリンクをクリックした後のリダイレクト
     url: "/",
     handleCodeInApp: true,
   };

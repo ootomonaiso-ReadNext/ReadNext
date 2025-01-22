@@ -11,7 +11,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import GoogleIcon from '@mui/icons-material/Google'; // Googleアイコンの追加
+import GoogleIcon from '@mui/icons-material/Google'; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +19,7 @@ const Login = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [requires2FA, setRequires2FA] = useState(false); // 2FAフラグ
+  const [requires2FA, setRequires2FA] = useState(false);
   const { setUser } = useAuth();
   const navigate = useNavigate();
 

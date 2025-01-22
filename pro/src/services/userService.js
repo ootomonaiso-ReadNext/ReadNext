@@ -1,11 +1,9 @@
-// src/services/userService.js
 import { db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 
 /**
- * ユーザーの基本情報と設定をFirestoreに保存
  * @param {string} uid - Firebase AuthenticationのユーザーUID
- * @param {string} userId - 一意のユーザーID
+ * @param {string} userId - ユーザーID
  * @param {string} userName - ユーザー名
  * @param {object} settings - ユーザーの設定情報
  */
