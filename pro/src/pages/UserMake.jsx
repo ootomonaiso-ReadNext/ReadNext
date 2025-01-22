@@ -47,7 +47,7 @@ const UserMake = () => {
         </Typography>
         {error && <Typography color="error">{error}</Typography>} {/* エラーメッセージの表示 */}
         <TextField
-          label="User ID (Unique)"
+          label="User ID"
           variant="outlined"
           fullWidth
           margin="normal"
