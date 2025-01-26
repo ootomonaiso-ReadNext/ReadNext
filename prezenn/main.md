@@ -155,6 +155,7 @@ style: |
 ![w:20em](yamu1.png)
 
 ---
+<!-- class: content-slide -->
 # CI/CDコード解説
 - build-and-deployはビルドとデプロイを行う命令
 - 実行環境はubuntuの最終環境を利用
@@ -164,6 +165,7 @@ style: |
 ![w:20em](yamu3.png)
 
 ---
+<!-- class: content-slide -->
 # 認証認可システム
 <section class="left-image-right-text">
   <img src="app1.png" alt="画像">
@@ -183,6 +185,22 @@ style: |
     <ul>
       <li>このアプリケーションにアクセスしたら実行されるコード</li>
       <li>認証情報を読み取り、</br>どこへリダイレクトするか判定</li>
+      <li>認証情報はAuthContextで取得</li>
     </ul>
   </div>
 </section>
+
+---
+<!-- class: content-slide -->
+# ユーザーデータ
+- Firebaseの認証情報にプロバイダとUIDと共に保存
+- UIDをもとにユーザーごとドキュメント生成
+- 内部にユーザーデータや蔵書データを保存
+
+---
+<!-- class: content-slide -->
+# Userテーブルの構造
+
+---
+<!-- class: content-slide -->
+# 
