@@ -31,7 +31,7 @@ export const logout = async () => {
   return await signOut(auth);
 };
 
-// メール認証を送信
+// メール認証用
 export const sendVerificationEmail = async (user) => {
   if (!user) throw new Error("ユーザー情報が見つかりません。");
   await sendEmailVerification(user); 
