@@ -23,14 +23,12 @@ function App() {
     <AuthProvider>
       <ThemeContextProvider>
         <Routes>
-          {/* 公開ルート */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/usermake" element={<UserMake />} />
           <Route path="/password-reset" element={<PasswordReset />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
-          {/* 保護されたルート */}
           <Route
             path="/"
             element={
@@ -96,7 +94,6 @@ function App() {
             }
           />
 
-          {/* 他のユーザーの読書履歴ページ */}
           <Route
             path="/user/:userId/reading-history"
             element={

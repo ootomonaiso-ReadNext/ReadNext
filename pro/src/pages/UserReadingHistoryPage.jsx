@@ -119,7 +119,6 @@ const UserReadingHistoryPage = () => {
           </Box>
         ) : (
           <>
-            {/* 読書履歴 */}
             <Box sx={{ my: 4 }}>
               <Typography variant="h5" gutterBottom>
                 読書履歴
