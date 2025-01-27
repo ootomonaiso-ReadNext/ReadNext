@@ -6,7 +6,7 @@ style: |
     font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
     color: #333;
-    padding: 2rem;
+    padding: 1.5rem; /* 全体の余白を調整 */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -49,23 +49,22 @@ style: |
   section.content-slide {
     background-color: rgb(255, 255, 255);
   }
-
   .left-image-right-text {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
+    justify-content: space-between; /* 左右均等配置 */
+    align-items: center; /* 中央揃え */
+    height: auto; /* 高さの自動調整 */
+    gap: 1rem; /* 画像とテキストの間隔を設定 */
   }
   .left-image-right-text img {
-    max-width: 45%;
-    height: auto;
+    max-width: 39%; /* 画像の最大幅を制限 */
+    height: auto; /* 比率を保持 */
   }
   .left-image-right-text .text-content {
-    max-width: 50%;
-    padding-left: 2rem;
+    flex: 1; /* テキストの幅を自動調整 */
+    padding: 0; /* 不要な余白を削除 */
   }
-
 ---
 <!-- class: title-slide -->
 # ReadNext
@@ -155,18 +154,27 @@ style: |
 ![w:20em](yamu1.png)
 
 ---
+<!-- class: content-slide -->
 # CI/CDコード解説
 - build-and-deployはビルドとデプロイを行う命令
 - 実行環境はubuntuの最終環境を利用
 ![w:20em](yamu2.png)
 
 ---
-![w:20em](yamu3.png)
+![w:19em](yamu3.png)
 
 ---
-# 認証認可システム
+<!-- class: content-slide -->
+# 認証システム - 実行の流れ
+- AuthContextをもとに認証状態の問い合わせ
+- OAuthプロバイダへの問い合わせ用コード
+
+---
+<!-- class: content-slide -->
+# 認証システム - 保護ルート
+
 <section class="left-image-right-text">
-  <img src="app1.png" alt="画像">
+  <img src="app1.png" alt="認証システムコードの画像">
   <div class="text-content">
     <ul>
       <li>認証状態が必要かどうかを宣言</li>
@@ -176,13 +184,45 @@ style: |
 </section>
 
 ---
-# 認証認可システム -アカウント制御
+<!-- class: content-slide -->
+# 認証システム - リダイレクト
+
 <section class="left-image-right-text">
-  <img src="app2.png" alt="画像">
+  <img src="app2.png" alt="認証システムの判定コード">
   <div class="text-content">
     <ul>
-      <li>このアプリケーションにアクセスしたら実行されるコード</li>
+      <li>サイトにアクセスしたら実行される</li>
       <li>認証情報を読み取り、</br>どこへリダイレクトするか判定</li>
+      <li>アクセス時にAuthContextからFirebaseOAuthへリクエスト</li>
     </ul>
   </div>
 </section>
+
+---
+<!-- class: content-slide -->
+# DB構成
+<section class="left-image-right-text">
+  <img src="db1.png" alt="認証システムの判定コード">
+  <div class="text-content">
+    <ul>
+      <li>ユーザー関連データのみ保存</li>
+      <li>ユーザー認証関連テーブルは別</li>
+      <li>蔵書は本テーブルのIDが外部キー</li>
+    </ul>
+  </div>
+</section>
+
+---
+<!-- class: content-slide -->
+# DB構成
+<section class="left-image-right-text">
+  <img src="db2.png" alt="認証システムの判定コード">
+  <div class="text-content">
+    <ul>
+      <li>本データとスレッドデータを保存</li>
+      <li>コレクションを分けて実行時余計なデータの読み取り防ぐ</li>
+      <li>データが存在しない場合nullを割り当て</li>
+    </ul>
+  </div>
+</section>
+

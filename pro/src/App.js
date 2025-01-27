@@ -16,21 +16,19 @@ import UserMake from "./pages/UserMake";
 import PasswordReset from "./pages/PasswordReset";
 import VerifyEmail from "./pages/VerifyEmail";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserReadingHistoryPage from "./pages/UserReadingHistoryPage"; // 追加
+import UserReadingHistoryPage from "./pages/UserReadingHistoryPage";
 
 function App() {
   return (
     <AuthProvider>
       <ThemeContextProvider>
         <Routes>
-          {/* 認証いらずルート */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/usermake" element={<UserMake />} />
           <Route path="/password-reset" element={<PasswordReset />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
-          {/* 保護ルート */}
           <Route
             path="/"
             element={
@@ -96,7 +94,6 @@ function App() {
             }
           />
 
-          {/* 他のユーザーの読書履歴ページ */}
           <Route
             path="/user/:userId/reading-history"
             element={
