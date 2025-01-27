@@ -123,62 +123,61 @@ const HomePage = () => {
               </Card>
             </Grid>
 
-            {/* ユーザーページへのリンク */}
-            {user && (
-              <Grid item xs={12}>
-                <Card
-                  elevation={3}
-                  sx={{
-                    position: "relative",
-                    overflow: "visible",
-                    backgroundColor: theme.palette.background.paper,
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      transition: "transform 0.3s ease-in-out",
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <SettingsIcon
-                        sx={{
-                          fontSize: 40,
-                          color: theme.palette.secondary.main,
-                          mr: 2,
-                        }}
-                      />
-                      <Typography variant="h4" component="h2" fontWeight="bold">
-                        ユーザーページへ行く
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="body1"
-                      sx={{ fontSize: "1.1rem", color: theme.palette.text.primary }}
-                    >
-                      ユーザー設定や情報を管理できます。
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ p: 2 }}>
-                    <Button
-                      component={Link}
-                      to="/reading-history"
-                      variant="contained"
-                      color="secondary"
-                      size="large"
-                      startIcon={<SettingsIcon />}
+            {/* 図書館リンクの下に読書履歴ページへのリンクを追加 */}
+            <Grid item xs={12}>
+              <Card
+                elevation={3}
+                sx={{
+                  position: "relative",
+                  overflow: "visible",
+                  backgroundColor: theme.palette.background.paper,
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    transition: "transform 0.3s ease-in-out",
+                  },
+                }}
+              >
+                <CardContent>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <MenuBookIcon
                       sx={{
-                        px: 4,
-                        py: 1.5,
-                        borderRadius: 2,
-                        fontWeight: "bold",
+                        fontSize: 40,
+                        color: theme.palette.secondary.main,
+                        mr: 2,
                       }}
-                    >
-                      ユーザーページへ移動
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            )}
+                    />
+                    <Typography variant="h4" component="h2" fontWeight="bold">
+                      あなたの図書館へ行く
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontSize: "1.1rem", color: theme.palette.text.primary }}
+                  >
+                    あなたの読書履歴を一覧表示し、過去の読書を振り返ることができます。
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ p: 2 }}>
+                  <Button
+                    component={Link}
+                    to={user ? `/user/${user.uid}/reading-history` : "#"}
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    startIcon={<BookmarkIcon />}
+                    sx={{
+                      px: 4,
+                      py: 1.5,
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                    }}
+                    disabled={!user}
+                  >
+                    読書履歴を見る
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
           </Grid>
         </Container>
       </Box>
