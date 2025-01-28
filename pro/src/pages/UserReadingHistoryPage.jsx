@@ -10,21 +10,26 @@ import {
   Grid,
   Card,
   CardContent,
+  Button
 } from "@mui/material";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import Layout from "../components/Layout";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const UserReadingHistoryPage = () => {
   const { userId } = useParams();
   const [userName, setUserName] = useState("");
   const [history, setHistory] = useState([]);
   const [bookshelf, setBookshelf] = useState([]);
+  const [recommendedBooks, setRecommendedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recommendationLoading, setRecommendationLoading] = useState(false);
 
   const fetchUserData = useCallback(async () => {
     try {
       setLoading(true);
 
-      // ユーザー情報の取得
       const userRef = doc(db, "users", userId);
       const userSnapshot = await getDoc(userRef);
       if (userSnapshot.exists()) {
@@ -34,62 +39,44 @@ const UserReadingHistoryPage = () => {
         return;
       }
 
-      // 蔵書一覧の取得
       const userBooksQuery = collection(db, "users", userId, "userBooks");
       const userBooksSnapshot = await getDocs(userBooksQuery);
-      let bookshelfData = [];
-      for (const userBookDoc of userBooksSnapshot.docs) {
-        const bookData = userBookDoc.data();
-        const bookId = bookData.bookId;
-
-        // 本のタイトルを取得
-        const bookDocRef = doc(db, "books", bookId);
-        const bookSnapshot = await getDoc(bookDocRef);
-        const bookTitle = bookSnapshot.exists()
-          ? bookSnapshot.data().title
-          : "タイトル不明";
-
-        // 蔵書データにタイトルを追加
-        bookshelfData.push({
-          ...bookData,
-          title: bookTitle,
-          bookId,
-        });
-      }
+      const bookshelfData = await Promise.all(
+        userBooksSnapshot.docs.map(async (userBookDoc) => {
+          const bookData = userBookDoc.data();
+          const bookId = bookData.bookId;
+          const bookDocRef = doc(db, "books", bookId);
+          const bookSnapshot = await getDoc(bookDocRef);
+          const bookTitle = bookSnapshot.exists()
+            ? bookSnapshot.data().title
+            : "タイトル不明";
+          return { ...bookData, title: bookTitle, bookId };
+        })
+      );
       setBookshelf(bookshelfData);
 
-      // 読書履歴の取得
-      let historyData = [];
-      for (const userBookDoc of userBooksSnapshot.docs) {
-        const bookId = userBookDoc.id;
-
-        const statusHistoryQuery = collection(
-          db,
-          "users",
-          userId,
-          "userBooks",
-          bookId,
-          "statusHistory"
-        );
-        const statusHistorySnapshot = await getDocs(statusHistoryQuery);
-
-        const bookDocRef = doc(db, "books", bookId);
-        const bookSnapshot = await getDoc(bookDocRef);
-        const bookTitle = bookSnapshot.exists()
-          ? bookSnapshot.data().title
-          : "タイトル不明";
-
-        statusHistorySnapshot.docs.forEach((doc) => {
-          historyData.push({
-            bookTitle,
+      const historyData = await Promise.all(
+        userBooksSnapshot.docs.flatMap(async (userBookDoc) => {
+          const bookId = userBookDoc.id;
+          const statusHistoryQuery = collection(
+            db,
+            "users",
+            userId,
+            "userBooks",
             bookId,
+            "statusHistory"
+          );
+          const statusHistorySnapshot = await getDocs(statusHistoryQuery);
+          return statusHistorySnapshot.docs.map((doc) => ({
+            bookId,
+            bookTitle: bookshelfData.find((b) => b.bookId === bookId)?.title || "タイトル不明",
             ...doc.data(),
             changedAt: doc.data().changedAt.toDate(),
-          });
-        });
-      }
-      historyData.sort((a, b) => b.changedAt - a.changedAt);
-      setHistory(historyData);
+          }));
+        })
+      );
+
+      setHistory(historyData.flat().sort((a, b) => b.changedAt - a.changedAt));
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
@@ -97,11 +84,58 @@ const UserReadingHistoryPage = () => {
     }
   }, [userId]);
 
+  const fetchRecommendations = async () => {
+    if (bookshelf.length === 0) {
+      alert("蔵書がありません。");
+      return;
+    }
+
+    try {
+      setRecommendationLoading(true);
+
+      const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const bookTitles = bookshelf.map((book) => book.title).join(", ");
+      const prompt = `以下の本に基づいて、おすすめの本を提案してください: ${bookTitles}`;
+
+      const result = await model.generateContent(prompt);
+
+      console.log("Gemini APIレスポンス (フォーマット済):", JSON.stringify(result, null, 2));
+
+      if (result.response?.candidates?.length > 0) {
+        const content = result.response.candidates[0]?.content?.parts[0]?.text || "";
+        const sections = content.split("\n\n").filter((section) => section.trim() !== "");
+
+        const formattedRecommendations = sections.map((section) => {
+          const [title, ...details] = section.split("\n");
+          return { title: title.trim(), details: details.join("\n").trim() };
+        });
+
+        setRecommendedBooks(formattedRecommendations);
+      } else {
+        console.error("Unexpected response structure:", JSON.stringify(result, null, 2));
+        alert("APIレスポンスの形式が不正です。");
+      }
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      alert("おすすめ本の取得中にエラーが発生しました。");
+    } finally {
+      setRecommendationLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (userId) {
       fetchUserData();
     }
   }, [userId, fetchUserData]);
+
+  const customRenderers = {
+    p: ({ children }) => <div>{children}</div>,
+    ul: ({ children }) => <ul style={{ marginLeft: "20px" }}>{children}</ul>,
+  };
 
   return (
     <Layout>
@@ -116,7 +150,6 @@ const UserReadingHistoryPage = () => {
           </Box>
         ) : (
           <Box>
-            {/* 読書履歴 */}
             <Box sx={{ my: 4 }}>
               <Typography variant="h5" gutterBottom>
                 読書履歴
@@ -142,8 +175,7 @@ const UserReadingHistoryPage = () => {
                           <strong>ステータス:</strong> {entry.status || "不明"}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                          <strong>変更日:</strong>{" "}
-                          {entry.changedAt.toLocaleString("ja-JP")}
+                          <strong>変更日:</strong> {entry.changedAt.toLocaleString("ja-JP")}
                         </Typography>
                       </CardContent>
                     </Card>
@@ -152,7 +184,6 @@ const UserReadingHistoryPage = () => {
               </Grid>
             </Box>
 
-            {/* 蔵書一覧 */}
             <Box sx={{ my: 4 }}>
               <Typography variant="h5" gutterBottom>
                 蔵書一覧
@@ -179,6 +210,59 @@ const UserReadingHistoryPage = () => {
                   </Grid>
                 ))}
               </Grid>
+            </Box>
+
+            <Box sx={{ my: 4, textAlign: "center" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={fetchRecommendations}
+                disabled={recommendationLoading}
+                sx={{
+                  padding: "10px 20px",
+                  borderRadius: "50px",
+                  transition: "background-color 0.3s, transform 0.3s",
+                  "&:hover": {
+                    backgroundColor: "#004d40",
+                    transform: "scale(1.05)",
+                  },
+                }}
+              >
+                {recommendationLoading ? "おすすめを取得中..." : "おすすめ本を取得"}
+              </Button>
+
+              {recommendedBooks.length > 0 && (
+                <Box sx={{ my: 4 }}>
+                  <Typography variant="h5" gutterBottom>
+                    おすすめ本
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Card
+                        sx={{
+                          borderRadius: "10px",
+                          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                          overflow: "hidden",
+                          padding: "16px",
+                        }}
+                      >
+                        {recommendedBooks.map((rec, index) => (
+                          <Box key={index} sx={{ mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                              {rec.title}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={customRenderers}>
+                                {rec.details}
+                              </ReactMarkdown>
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Card>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
             </Box>
           </Box>
         )}
