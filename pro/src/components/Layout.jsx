@@ -23,6 +23,7 @@ import {
   Search as SearchIcon,
   ExitToApp as ExitToAppIcon,
   Menu as MenuIcon,
+  History as HistoryIcon, // 新しいアイコンのインポート
 } from "@mui/icons-material";
 
 const Layout = ({ children }) => {
@@ -105,6 +106,12 @@ const Layout = ({ children }) => {
               component={Link}
               to="/book-search"
             />
+            <BottomNavigationAction
+              label="読書履歴"
+              icon={<HistoryIcon />}
+              component={Link}
+              to={`/user/${user?.uid}/reading-history`}
+            />
             {user && (
               <BottomNavigationAction
                 label="ログアウト"
@@ -153,6 +160,15 @@ const Layout = ({ children }) => {
                 </ListItemIcon>
                 <ListItemText primary="検索" />
               </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to={`/user/${user?.uid}/reading-history`}
+              >
+                <ListItemIcon>
+                  <HistoryIcon />
+                </ListItemIcon>
+                <ListItemText primary="読書履歴" />
+              </ListItemButton>
             </List>
             {user && (
               <Box sx={{ mt: "auto", px: 2, pb: 2 }}>
@@ -172,7 +188,7 @@ const Layout = ({ children }) => {
               flex: 1,
               p: 3,
               marginLeft: drawerOpen ? "240px" : "0",
-              marginTop: "64px", 
+              marginTop: "64px",
               transition: "margin-left 0.3s",
             }}
           >
